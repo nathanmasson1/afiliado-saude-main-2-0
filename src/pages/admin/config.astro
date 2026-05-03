@@ -1,0 +1,12 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ConfigEditor from '../../components/admin/ConfigEditor';
+---
+<AdminLayout title="Configurações" activeSection="config">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-slate-900">Configurações</h1>
+        <p class="text-slate-500 mt-1">Nome, logo, cores, fontes e redes sociais do site.</p>
+    </div>
+    <ConfigEditor client:load />
+</AdminLayout>

@@ -1,0 +1,289 @@
+---
+import { readData } from '../lib/readData';
+
+const site = readData('siteConfig.json') || {};
+const footer = readData('footer.json') || {};
+
+const currentYear = new Date().getFullYear();
+
+const siteName = site.name || 'SeuBlog';
+const siteLogo = site.logo || '';
+const logoMark = (site.logoMark || siteName.charAt(0) || 'S').toUpperCase();
+
+const cta = footer.cta || { title: 'Não perca nenhuma', titleAccent: 'recomendação', text: 'Acompanhe nosso blog.' };
+const about = footer.about || '';
+const social = footer.social || [];
+const columns = footer.columns || [];
+const copyright = (footer.copyright || `© {year} ${siteName}. Todos os direitos reservados.`).replace('{year}', String(currentYear));
+const disclaimer = footer.disclaimer || '';
+---
+
+<footer class="footer" id="contato">
+  <div class="footer-top">
+    <div class="container">
+      <div class="footer-cta animate-on-scroll">
+        <h2 class="footer-cta-title">
+          {cta.title}
+          <span class="footer-cta-accent">{cta.titleAccent}</span>
+        </h2>
+        <p class="footer-cta-text">{cta.text}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-main">
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Column 1: About -->
+        <div class="footer-col footer-col-about">
+          <a href="/" class="footer-logo">
+            {siteLogo ? (
+              <img src={siteLogo} alt={siteName} class="footer-logo-image" />
+            ) : (
+              <>
+                <span class="footer-logo-mark">{logoMark}</span>
+                <span class="footer-logo-text">{siteName}</span>
+              </>
+            )}
+          </a>
+          <p class="footer-about">{about}</p>
+          <div class="footer-social">
+            {social.map((s: any) => (
+              <a href={s.href} class="footer-social-link" aria-label={s.label} set:html={s.icon} />
+            ))}
+          </div>
+        </div>
+
+        {columns.map((col: any) => (
+          <div class="footer-col">
+            <h3 class="footer-heading">{col.heading}</h3>
+            <ul class="footer-links">
+              {(col.links || []).map((link: any) => (
+                <li>
+                  <a href={link.href} class="footer-link">{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <p class="footer-copy">{copyright}</p>
+      <p class="footer-disclaimer">{disclaimer}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background-color: var(--color-bg-dark);
+    color: #ccc;
+  }
+
+  /* CTA Section */
+  .footer-top {
+    padding: var(--space-4xl) 0;
+    background: var(--color-primary);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .footer-top::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    background-image: radial-gradient(#fff 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .footer-cta {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-cta-title {
+    font-family: var(--font-heading);
+    font-size: var(--fs-3xl);
+    font-weight: var(--fw-extrabold);
+    color: #fff;
+    margin-bottom: var(--space-md);
+    letter-spacing: var(--ls-tight);
+  }
+
+  .footer-cta-accent {
+    font-family: var(--font-display);
+    font-weight: var(--fw-regular);
+    font-style: italic;
+    color: var(--color-primary-lighter);
+  }
+
+  .footer-cta-text {
+    font-size: var(--fs-md);
+    color: rgba(255, 255, 255, 0.75);
+    max-width: 480px;
+    margin: 0 auto;
+    font-weight: var(--fw-light);
+  }
+
+  /* Main footer */
+  .footer-main {
+    padding: var(--space-4xl) 0 var(--space-3xl);
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr 1fr;
+    gap: var(--space-4xl);
+  }
+
+  .footer-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    text-decoration: none;
+    margin-bottom: var(--space-xl);
+  }
+
+  .footer-logo:hover {
+    color: #fff;
+  }
+
+  .footer-logo-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--color-primary-medium);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-style: italic;
+    border-radius: var(--radius-sm);
+  }
+
+  .footer-logo-text {
+    font-family: var(--font-heading);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+    color: #fff;
+    letter-spacing: var(--ls-tight);
+  }
+
+  .footer-logo-image {
+    height: 38px;
+    width: auto;
+    display: block;
+  }
+
+  .footer-about {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-relaxed);
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: var(--space-xl);
+    max-width: 340px;
+    font-weight: var(--fw-light);
+  }
+
+  .footer-social {
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  .footer-social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.5);
+    transition: all var(--transition-base);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .footer-social-link:hover {
+    background: var(--color-primary-medium);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(45, 106, 79, 0.3);
+  }
+
+  .footer-heading {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: var(--space-xl);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-widest);
+  }
+
+  .footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .footer-link {
+    font-size: var(--fs-sm);
+    color: rgba(255, 255, 255, 0.55);
+    transition: all var(--transition-fast);
+    font-weight: var(--fw-light);
+    display: inline-block;
+  }
+
+  .footer-link:hover {
+    color: #fff;
+    transform: translateX(4px);
+  }
+
+  /* Bottom bar */
+  .footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding: var(--space-xl) 0;
+  }
+
+  .footer-bottom-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-xl);
+  }
+
+  .footer-copy {
+    font-size: var(--fs-xs);
+    color: rgba(255, 255, 255, 0.25);
+  }
+
+  .footer-disclaimer {
+    font-size: var(--fs-xs);
+    color: rgba(255, 255, 255, 0.2);
+    max-width: 440px;
+    text-align: right;
+    line-height: var(--lh-normal);
+  }
+
+  @media (max-width: 768px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-2xl);
+    }
+
+    .footer-bottom-inner {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .footer-disclaimer {
+      text-align: center;
+      max-width: 100%;
+    }
+  }
+</style>

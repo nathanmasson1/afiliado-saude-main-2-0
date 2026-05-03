@@ -1,0 +1,12 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import SettingsAdSense from '../../plugins/adsense/SettingsAdSense';
+---
+<AdminLayout title="Google AdSense" activeSection="adsense">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-slate-900">Google AdSense</h1>
+        <p class="text-slate-500 mt-1">Configure a monetização com Google AdSense auto-ads.</p>
+    </div>
+    <SettingsAdSense client:load />
+</AdminLayout>

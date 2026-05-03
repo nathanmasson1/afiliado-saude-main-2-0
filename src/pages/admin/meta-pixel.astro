@@ -1,0 +1,12 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import SettingsMetaPixel from '../../plugins/meta-pixel/SettingsMetaPixel';
+---
+<AdminLayout title="Meta Pixel" activeSection="meta-pixel">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-slate-900">Meta Pixel</h1>
+        <p class="text-slate-500 mt-1">Configure o rastreamento de eventos do Meta (Facebook) Pixel.</p>
+    </div>
+    <SettingsMetaPixel client:load />
+</AdminLayout>

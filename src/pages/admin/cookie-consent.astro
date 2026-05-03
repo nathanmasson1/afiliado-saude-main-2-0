@@ -1,0 +1,12 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import SettingsCookieConsent from '../../plugins/cookie-consent/SettingsCookieConsent';
+---
+<AdminLayout title="Cookie Consent / LGPD" activeSection="cookie-consent">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-slate-900">Cookie Consent / LGPD</h1>
+        <p class="text-slate-500 mt-1">Configure o banner de consentimento de cookies para conformidade com a LGPD.</p>
+    </div>
+    <SettingsCookieConsent client:load />
+</AdminLayout>

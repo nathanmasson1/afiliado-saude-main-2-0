@@ -1,0 +1,75 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import AIPostGenerator from '../../plugins/ai-generator/AIPostGenerator';
+import SettingsAI from '../../plugins/ai-generator/SettingsAI';
+import { readData } from '../../lib/readData';
+
+const authorsRaw = readData<any[]>('authors.json', []);
+const categoriesRaw = readData<string[]>('categories.json', []);
+const pluginsConfig = readData<any>('pluginsConfig.json', {});
+
+// Normaliza autores para o formato {slug, name} esperado pelo componente
+const authors = authorsRaw.map((a: any) => ({ slug: a.id || a.slug, name: a.name }));
+
+// Categorias no Walker são strings simples
+const categories = categoriesRaw.map((c: string) => ({ slug: c, name: c }));
+
+// Abre em Configurações se não há API key
+const hasApiKey = !!(pluginsConfig?.ai?.apiKey);
+const defaultTab = hasApiKey ? 'generate' : 'settings';
+---
+<AdminLayout title="Gerar posts com IA" activeSection="ai">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-slate-900">Gerar posts com IA</h1>
+        <p class="text-slate-500 mt-1">Gere posts completos automaticamente e configure as chaves de API.</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mb-6">
+        <div class="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
+            <button
+                id="tab-generate"
+                onclick="showTab('generate')"
+                class={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${defaultTab === 'generate' ? 'bg-white text-violet-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+            >
+                ✨ Gerar Post
+            </button>
+            <button
+                id="tab-settings"
+                onclick="showTab('settings')"
+                class={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${defaultTab === 'settings' ? 'bg-white text-violet-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+            >
+                ⚙️ Configurações{!hasApiKey && <span class="ml-1.5 w-2 h-2 bg-amber-400 rounded-full inline-block"></span>}
+            </button>
+        </div>
+    </div>
+
+    <div id="panel-generate" class={defaultTab === 'generate' ? '' : 'hidden'}>
+        <AIPostGenerator client:load authors={authors} categories={categories} />
+    </div>
+    <div id="panel-settings" class={defaultTab === 'settings' ? '' : 'hidden'}>
+        <SettingsAI client:load />
+    </div>
+</AdminLayout>
+
+<script is:inline>
+function showTab(tab) {
+    var generate = document.getElementById('panel-generate');
+    var settings = document.getElementById('panel-settings');
+    var tabGenerate = document.getElementById('tab-generate');
+    var tabSettings = document.getElementById('tab-settings');
+
+    if (tab === 'generate') {
+        generate.classList.remove('hidden');
+        settings.classList.add('hidden');
+        tabGenerate.className = 'px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-white text-violet-700 shadow-sm';
+        tabSettings.className = 'px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900';
+    } else {
+        generate.classList.add('hidden');
+        settings.classList.remove('hidden');
+        tabGenerate.className = 'px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900';
+        tabSettings.className = 'px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-white text-violet-700 shadow-sm';
+    }
+}
+</script>

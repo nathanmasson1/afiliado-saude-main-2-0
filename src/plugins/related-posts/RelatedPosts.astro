@@ -1,0 +1,92 @@
+---
+/**
+ * RelatedPosts.astro — Plugin Related Posts
+ *
+ * Exibe posts relacionados por categoria após o author box.
+ * Filtra por mesma categoria, exclui post atual, embaralha e limita.
+ */
+import { getCollection } from 'astro:content';
+import { readData } from '../../lib/readData';
+
+interface Props {
+  currentSlug: string;
+  category: string;
+  count?: number;
+}
+
+const { currentSlug, category, count } = Astro.props;
+
+const pluginsConfig = readData('pluginsConfig.json', {}) as any;
+const relatedConfig = pluginsConfig?.relatedPosts;
+const enabled = relatedConfig?.enabled !== false;
+const maxCount = count ?? relatedConfig?.count ?? 3;
+
+let relatedPosts: any[] = [];
+
+if (enabled && category) {
+  const allPosts = await getCollection('blog');
+  const filtered = allPosts.filter(p =>
+    p.slug !== currentSlug &&
+    p.data.category === category &&
+    !p.data.draft
+  );
+
+  // Shuffle
+  for (let i = filtered.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [filtered[i], filtered[j]] = [filtered[j], filtered[i]];
+  }
+
+  relatedPosts = filtered.slice(0, maxCount);
+}
+---
+
+{enabled && relatedPosts.length > 0 && (
+  <div class="related-posts-section">
+    <div class="section-header">
+      <h3 class="section-title">Artigos Relacionados</h3>
+      <img src="/images/wave.svg" class="wave" alt="wave" />
+    </div>
+
+    <div class="row gy-4">
+      {relatedPosts.map(post => {
+        const postDate = post.data.pubDate instanceof Date
+          ? post.data.pubDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+          : new Date(post.data.pubDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+        const postCategory = post.data.category || '';
+        const catSlug = postCategory.toLowerCase().replace(/[^a-z0-9]/g, '-');
+        return (
+          <div class="col-md-4">
+            <div class="post post-grid rounded bordered">
+              {post.data.image && (
+                <div class="thumb top-rounded">
+                  <a href={`/blog/${post.slug}`}>
+                    <div class="inner">
+                      <img src={post.data.image} alt={post.data.title} loading="lazy" />
+                    </div>
+                  </a>
+                  {postCategory && (
+                    <a href={`/categoria/${catSlug}`} class="category-badge">{postCategory}</a>
+                  )}
+                </div>
+              )}
+              <div class="details clearfix">
+                <ul class="meta list-inline mb-0">
+                  <li class="list-inline-item">
+                    <a href={`/blog/${post.slug}`}>{postDate}</a>
+                  </li>
+                </ul>
+                <h4 class="title">
+                  <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+                </h4>
+                {post.data.description && (
+                  <p class="post-excerpt">{post.data.description}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+)}

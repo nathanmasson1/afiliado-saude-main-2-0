@@ -1,0 +1,9 @@
+---
+interface Props {
+  currentSlug: string;
+  category: string;
+}
+const { currentSlug, category } = Astro.props;
+import RelatedPosts from '../related-posts/RelatedPosts.astro';
+---
+<RelatedPosts currentSlug={currentSlug} category={category} />

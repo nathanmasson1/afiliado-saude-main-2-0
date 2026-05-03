@@ -1,0 +1,43 @@
+---
+/**
+ * MetaPixel.astro — Plugin Meta Pixel (Facebook Pixel)
+ *
+ * Injeta o snippet do Meta Pixel no <head> de todas as páginas públicas.
+ * Lê o pixelId de src/data/pluginsConfig.json via readData().
+ * Se cookieConsent.enabled for true, aguarda o evento 'cookies-accepted'
+ * ou verifica localStorage antes de carregar o script.
+ * Se pixelId estiver vazio, não renderiza nada.
+ */
+import { readData } from '../../lib/readData';
+
+const pluginsConfig = readData('pluginsConfig.json', {}) as any;
+const pixelId: string = pluginsConfig?.metaPixel?.pixelId?.trim() || '';
+const requireConsent: boolean = pluginsConfig?.cookieConsent?.enabled !== false;
+---
+
+{pixelId && (
+  <script define:vars={{ pixelId, requireConsent }}>
+  (function() {
+    function loadPixel() {
+      if (window.__fbq_loaded) return;
+      window.__fbq_loaded = true;
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window,document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', pixelId);
+      fbq('track', 'PageView');
+    }
+
+    if (!requireConsent || localStorage.getItem('cookies-accepted') === 'true') {
+      loadPixel();
+    } else {
+      window.addEventListener('cookies-accepted', loadPixel, { once: true });
+    }
+  })();
+  </script>
+)}

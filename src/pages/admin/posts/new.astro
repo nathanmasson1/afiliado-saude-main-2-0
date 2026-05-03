@@ -1,0 +1,8 @@
+---
+export const prerender = false;
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import PostEditor from '../../../components/admin/PostEditor';
+---
+<AdminLayout title="Novo Artigo" activeSection="posts">
+    <PostEditor filePath={null} client:load />
+</AdminLayout>

@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import SocialProof from '../components/SocialProof.astro';
+import PostsGrid from '../components/PostsGrid.astro';
+import About from '../components/About.astro';
+import { readData } from '../lib/readData';
+
+const home = readData('home.json');
+---
+
+<BaseLayout
+  title="Home"
+  description="Descubra os melhores produtos físicos e digitais com reviews honestos, comparativos detalhados e recomendações de confiança."
+>
+  <Hero data={home.hero} />
+  <SocialProof data={home.socialProof} />
+  <PostsGrid data={home.postsGrid} />
+  <About data={home.about} />
+</BaseLayout>

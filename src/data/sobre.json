@@ -1,0 +1,57 @@
+{
+  "seo": {
+    "title": "Sobre",
+    "description": "Conheça a história do SeuBlog, nossa missão e os valores que guiam cada review e recomendação que publicamos.",
+    "image": ""
+  },
+  "hero": {
+    "label": "Sobre Nós",
+    "title": "Ajudamos você a fazer",
+    "titleAccent": "escolhas inteligentes",
+    "subtitle": "Somos um blog independente de reviews e recomendações. Nossa missão é simples: testar produtos e contar a verdade sobre eles."
+  },
+  "story": {
+    "label": "Nossa História",
+    "title": "De curiosidade pessoal a",
+    "titleAccent": "referência em reviews",
+    "paragraphs": [
+      "Tudo começou com uma frustração: comprar um produto caro online e descobrir que não era nada do que prometiam. Depois de jogar dinheiro fora algumas vezes, decidimos criar o conteúdo que gostaríamos de ter encontrado antes.",
+      "Hoje, somos uma equipe apaixonada por tecnologia, casa e bem-estar. Avaliamos produtos físicos das maiores lojas online e produtos digitais das principais plataformas — sempre com a mesma pergunta: \"Eu recomendaria isso para um amigo?\"",
+      "Se a resposta for não, o produto não entra na lista. Simples assim."
+    ],
+    "stats": [
+      { "number": "500+", "label": "Produtos avaliados" },
+      { "number": "50k+", "label": "Leitores mensais" },
+      { "number": "4.9", "label": "Avaliação média" },
+      { "number": "3 anos", "label": "De conteúdo" }
+    ]
+  },
+  "values": {
+    "label": "Nossos Valores",
+    "title": "O que nos guia",
+    "subtitle": "Cada review que publicamos segue esses princípios inegociáveis.",
+    "items": [
+      { "number": "01", "title": "Honestidade Radical", "text": "Se um produto é ruim, dizemos que é ruim. Não recomendamos nada que não usaríamos nós mesmos. Nosso compromisso é com você, não com as marcas." },
+      { "number": "02", "title": "Transparência Total", "text": "Usamos links de afiliado — e você sempre sabe quando. Essa receita nos permite continuar criando conteúdo gratuito e de qualidade." },
+      { "number": "03", "title": "Rigor nas Análises", "text": "Cada produto é testado por no mínimo 7 dias antes de publicarmos. Pesquisamos especificações, comparamos preços e ouvimos outros consumidores." },
+      { "number": "04", "title": "Foco no Leitor", "text": "Escrevemos para pessoas reais, não para algoritmos. Se um post não ajuda você a tomar uma decisão melhor, ele não merece ser publicado." }
+    ]
+  },
+  "timeline": {
+    "label": "Linha do Tempo",
+    "title": "Nossa jornada",
+    "items": [
+      { "year": "2022", "title": "O Início", "text": "Começamos como um hobby — testando produtos e compartilhando opiniões honestas com amigos e familiares." },
+      { "year": "2023", "title": "Crescimento", "text": "Alcançamos 10 mil leitores mensais e fechamos parceria com as maiores plataformas de afiliados do Brasil." },
+      { "year": "2024", "title": "Consolidação", "text": "Mais de 500 produtos avaliados, 50 mil leitores mensais e uma comunidade engajada que confia em nossas recomendações." },
+      { "year": "2025", "title": "O Futuro", "text": "Expandindo para vídeo reviews, comparativos interativos e uma newsletter semanal com as melhores ofertas." }
+    ]
+  },
+  "cta": {
+    "title": "Pronto para descobrir os",
+    "titleAccent": "melhores produtos?",
+    "text": "Explore nosso blog e encontre reviews honestos para sua próxima compra.",
+    "ctaPrimary": { "text": "Ver Blog", "href": "/blog" },
+    "ctaSecondary": { "text": "Fale Conosco", "href": "/contato" }
+  }
+}

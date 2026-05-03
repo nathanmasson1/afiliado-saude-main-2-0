@@ -1,0 +1,22 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  url: string;
+  image?: string;
+  datePublished?: string;
+  authorName?: string;
+  category?: string;
+}
+const { title, description, url, image, datePublished, authorName, category } = Astro.props;
+import SchemaMarkup from '../seo/SchemaMarkup.astro';
+---
+<SchemaMarkup
+  title={title}
+  description={description}
+  url={url}
+  image={image}
+  datePublished={datePublished}
+  authorName={authorName}
+  category={category}
+/>

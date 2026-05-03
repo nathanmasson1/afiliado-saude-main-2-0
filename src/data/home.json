@@ -1,0 +1,106 @@
+{
+  "hero": {
+    "badge": "Blog de Reviews & Recomendações",
+    "title": "Descubra os Melhores Produtos para Review",
+    "subtitle": "Reviews honestos, comparativos detalhados e recomendações dos melhores produtos físicos e digitais do mercado.",
+    "ctaPrimary": {
+      "text": "Ver Recomendações",
+      "href": "/blog"
+    },
+    "ctaSecondary": {
+      "text": "Sobre Nós",
+      "href": "/sobre"
+    },
+    "image": "/images/hero.jpg",
+    "stats": [
+      {
+        "number": "500+",
+        "label": "Produtos Avaliados"
+      },
+      {
+        "number": "50k+",
+        "label": "Leitores Mensais"
+      },
+      {
+        "number": "98%",
+        "label": "Satisfação"
+      }
+    ]
+  },
+  "socialProof": {
+    "stats": [
+      {
+        "number": "4.9",
+        "suffix": "/5",
+        "label": "Avaliação Média",
+        "detail": "+200 reviews verificados"
+      },
+      {
+        "number": "50k",
+        "suffix": "+",
+        "label": "Leitores Mensais",
+        "detail": "Crescendo todo mês"
+      },
+      {
+        "number": "500",
+        "suffix": "+",
+        "label": "Produtos Avaliados",
+        "detail": "Reviews detalhados"
+      },
+      {
+        "number": "R$2M",
+        "suffix": "+",
+        "label": "Economia Gerada",
+        "detail": "Para nossos leitores"
+      }
+    ],
+    "brands": [
+      "Amazon",
+      "Hotmart",
+      "Mercado Livre",
+      "Shopee",
+      "Eduzz",
+      "Monetizze"
+    ]
+  },
+  "postsGrid": {
+    "label": "Blog",
+    "title": "Últimos Posts",
+    "subtitle": "Confira nossos reviews mais recentes, dicas e comparativos para fazer as melhores escolhas.",
+    "limit": 6,
+    "ctaText": "Ver Todos os Posts",
+    "ctaHref": "/blog"
+  },
+  "about": {
+    "label": "Sobre Nós",
+    "title": "Ajudamos você a fazer",
+    "titleAccent": "as melhores escolhas",
+    "text1": "Somos apaixonados por encontrar os melhores produtos do mercado. Nosso blog nasceu da vontade de ajudar pessoas a tomar decisões de compra mais inteligentes, economizando tempo e dinheiro.",
+    "text2": "Avaliamos produtos físicos das maiores lojas online e produtos digitais das principais plataformas, sempre com honestidade e transparência.",
+    "ctaPrimary": {
+      "text": "Saiba Mais",
+      "href": "/sobre"
+    },
+    "ctaSecondary": {
+      "text": "Fale Conosco",
+      "href": "/contato"
+    },
+    "features": [
+      {
+        "number": "01",
+        "title": "Análises Detalhadas",
+        "description": "Testamos e avaliamos cada produto com critérios rigorosos antes de recomendar."
+      },
+      {
+        "number": "02",
+        "title": "100% Transparente",
+        "description": "Informamos quando usamos links de afiliado. Nossa prioridade é sua confiança."
+      },
+      {
+        "number": "03",
+        "title": "Curadoria de Qualidade",
+        "description": "Selecionamos apenas produtos que realmente fazem diferença na vida das pessoas."
+      }
+    ]
+  }
+}

@@ -1,0 +1,656 @@
+---
+/**
+ * AffiliateProducts.astro — Renderizador de shortcodes de afiliados Amazon
+ *
+ * Injeta dados dos produtos + config via <script type="application/json">.
+ * JS client-side escaneia .post-content por shortcodes e injeta os cards.
+ *
+ * Shortcodes suportados:
+ *   [affiliate:slug]                — ProductBox completo
+ *   [affiliate-compare:slug1,slug2] — cards comparativos lado a lado
+ */
+import { readData } from '../../lib/readData';
+
+const pluginsConfig = readData('pluginsConfig.json', {}) as any;
+const config = pluginsConfig?.affiliates;
+
+const enabled = config?.enabled === true;
+const products = enabled ? readData('affiliateProducts.json', []) as any[] : [];
+const activeProducts = products.filter((p: any) => p.enabled !== false);
+---
+
+{enabled && activeProducts.length > 0 && (
+  <script
+    type="application/json"
+    id="aff-data"
+    set:html={JSON.stringify({ products: activeProducts, config })}
+  />
+)}
+
+{enabled && (
+  <style>
+    .aff-box {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      margin: 2rem 0;
+      background: #fff;
+      font-family: inherit;
+    }
+    .aff-badge {
+      background: #FF9900;
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.35rem 1rem;
+      display: inline-block;
+    }
+    .aff-body {
+      display: flex;
+      gap: 1.5rem;
+      padding: 1.25rem 1.5rem 0;
+      flex-wrap: wrap;
+    }
+    .aff-image-wrap {
+      flex-shrink: 0;
+      width: 160px;
+    }
+    .aff-image-wrap img {
+      width: 100%;
+      height: 160px;
+      object-fit: contain;
+      border-radius: 0.5rem;
+      background: #f8fafc;
+    }
+    .aff-info {
+      flex: 1;
+      min-width: 180px;
+    }
+    .aff-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0 0 0.35rem;
+      line-height: 1.3;
+    }
+    .aff-stars {
+      color: #FF9900;
+      font-size: 1rem;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .aff-stars span {
+      color: #64748b;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .aff-prices {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+    .aff-price {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #b45309;
+    }
+    .aff-original-price {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      text-decoration: line-through;
+    }
+    .aff-desc {
+      font-size: 0.875rem;
+      color: #475569;
+      margin: 0 0 0.75rem;
+      line-height: 1.5;
+    }
+    .aff-proscons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .aff-pros-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #16a34a;
+      margin-bottom: 0.3rem;
+    }
+    .aff-cons-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #dc2626;
+      margin-bottom: 0.3rem;
+    }
+    .aff-pros li, .aff-cons li {
+      font-size: 0.8rem;
+      color: #374151;
+      line-height: 1.4;
+      list-style: none;
+      padding: 0;
+      margin: 0 0 0.2rem;
+      padding-left: 1.1rem;
+      position: relative;
+    }
+    .aff-pros li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #16a34a;
+      font-weight: 700;
+    }
+    .aff-cons li::before {
+      content: '✗';
+      position: absolute;
+      left: 0;
+      color: #dc2626;
+      font-weight: 700;
+    }
+    .aff-pros ul, .aff-cons ul {
+      margin: 0;
+      padding: 0;
+    }
+    .aff-cta-wrap {
+      padding: 1.25rem 1.5rem;
+      border-top: 1px solid #f1f5f9;
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.625rem;
+      align-items: center;
+      justify-content: center;
+    }
+    .aff-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #FF9900;
+      color: #fff !important;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.75rem 2rem;
+      border-radius: 0.625rem;
+      text-decoration: none !important;
+      transition: opacity 0.2s, transform 0.1s;
+      border: none;
+      cursor: pointer;
+    }
+    .aff-cta:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+    .aff-cta-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #fff;
+      color: #374151 !important;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 0.65rem 1.25rem;
+      border-radius: 0.625rem;
+      text-decoration: none !important;
+      transition: background 0.2s, border-color 0.2s, transform 0.1s;
+      border: 1.5px solid #e2e8f0;
+      cursor: pointer;
+    }
+    .aff-cta-secondary:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
+    .aff-disclaimer {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      text-align: center;
+      padding: 0.5rem 1.5rem 1rem;
+    }
+
+    /* Comparison cards */
+    .aff-compare-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .aff-compare-card {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 0.875rem;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+    }
+    .aff-compare-card img {
+      width: 100%;
+      height: 140px;
+      object-fit: contain;
+      background: #f8fafc;
+      padding: 0.5rem;
+    }
+    .aff-compare-body {
+      padding: 0.875rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .aff-compare-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0 0 0.4rem;
+      line-height: 1.3;
+    }
+    .aff-compare-stars {
+      color: #FF9900;
+      font-size: 0.85rem;
+      margin-bottom: 0.35rem;
+    }
+    .aff-compare-price {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #b45309;
+      margin-bottom: 0.75rem;
+    }
+    .aff-compare-cta {
+      display: block;
+      text-align: center;
+      background: #FF9900;
+      color: #fff !important;
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.55rem 1rem;
+      border-radius: 0.5rem;
+      text-decoration: none !important;
+      transition: opacity 0.2s;
+      margin-top: auto;
+    }
+    .aff-compare-cta:hover {
+      opacity: 0.9;
+    }
+
+    /* Post disclaimer banner */
+    .aff-post-disclaimer {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem;
+      color: #92400e;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .aff-post-disclaimer svg {
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    @media (max-width: 600px) {
+      .aff-body {
+        flex-direction: column;
+      }
+      .aff-image-wrap {
+        width: 100%;
+      }
+      .aff-image-wrap img {
+        height: 200px;
+      }
+      .aff-proscons {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+)}
+
+{enabled && (
+  <script>
+  (function() {
+    const dataEl = document.getElementById('aff-data');
+    if (!dataEl) return;
+
+    let parsed: any;
+    try { parsed = JSON.parse(dataEl.textContent || '{}'); } catch { return; }
+
+    const { products, config } = parsed as {
+      products: any[];
+      config: any;
+    };
+
+    if (!products || !products.length) return;
+
+    const productMap: Record<string, any> = {};
+    products.forEach((p: any) => { productMap[p.slug] = p; });
+
+    const buttonColor = config?.buttonColor || '#FF9900';
+    const defaultButtonText = config?.defaultButtonText || 'Ver na Amazon';
+    const amazonTag = config?.amazonTag || '';
+    const showPrices = config?.showPrices !== false;
+    const showRatings = config?.showRatings !== false;
+    const showProscons = config?.showProscons !== false;
+    const showBadges = config?.showBadges !== false;
+    const showDisclaimer = config?.showDisclaimer !== false;
+    const disclaimer = config?.disclaimer || '';
+
+    function appendTag(url: string): string {
+      if (!amazonTag || !url) return url;
+      try {
+        const u = new URL(url);
+        u.searchParams.set('tag', amazonTag);
+        return u.toString();
+      } catch {
+        const sep = url.includes('?') ? '&' : '?';
+        return `${url}${sep}tag=${amazonTag}`;
+      }
+    }
+
+    function renderStars(rating: number): string {
+      const full = Math.floor(rating);
+      const half = rating % 1 >= 0.5;
+      let s = '';
+      for (let i = 0; i < 5; i++) {
+        if (i < full) s += '★';
+        else if (i === full && half) s += '½';
+        else s += '☆';
+      }
+      return s;
+    }
+
+    function buildProductBox(p: any): HTMLElement {
+      const wrap = document.createElement('div');
+      wrap.className = 'aff-box';
+
+      const badgeText = p.badge || '';
+      if (showBadges && badgeText) {
+        const badge = document.createElement('div');
+        badge.className = 'aff-badge';
+        badge.textContent = badgeText;
+        wrap.appendChild(badge);
+      }
+
+      const body = document.createElement('div');
+      body.className = 'aff-body';
+
+      if (p.image) {
+        const imgWrap = document.createElement('div');
+        imgWrap.className = 'aff-image-wrap';
+        const img = document.createElement('img');
+        img.src = p.image;
+        img.alt = p.title || '';
+        img.loading = 'lazy';
+        imgWrap.appendChild(img);
+        body.appendChild(imgWrap);
+      }
+
+      const info = document.createElement('div');
+      info.className = 'aff-info';
+
+      const title = document.createElement('p');
+      title.className = 'aff-title';
+      title.textContent = p.title || '';
+      info.appendChild(title);
+
+      if (showRatings && p.rating) {
+        const stars = document.createElement('div');
+        stars.className = 'aff-stars';
+        stars.innerHTML = renderStars(p.rating) + `<span>${Number(p.rating).toFixed(1)}/5</span>`;
+        info.appendChild(stars);
+      }
+
+      if (showPrices && p.price) {
+        const prices = document.createElement('div');
+        prices.className = 'aff-prices';
+        const price = document.createElement('span');
+        price.className = 'aff-price';
+        price.textContent = p.price;
+        prices.appendChild(price);
+        if (p.originalPrice) {
+          const orig = document.createElement('span');
+          orig.className = 'aff-original-price';
+          orig.textContent = p.originalPrice;
+          prices.appendChild(orig);
+        }
+        info.appendChild(prices);
+      }
+
+      if (p.description) {
+        const desc = document.createElement('p');
+        desc.className = 'aff-desc';
+        desc.textContent = p.description;
+        info.appendChild(desc);
+      }
+
+      if (showProscons && ((p.pros && p.pros.length) || (p.cons && p.cons.length))) {
+        const pc = document.createElement('div');
+        pc.className = 'aff-proscons';
+
+        if (p.pros && p.pros.length) {
+          const prosCol = document.createElement('div');
+          prosCol.className = 'aff-pros';
+          const prosTitle = document.createElement('div');
+          prosTitle.className = 'aff-pros-title';
+          prosTitle.textContent = 'Prós';
+          prosCol.appendChild(prosTitle);
+          const ul = document.createElement('ul');
+          p.pros.forEach((item: string) => {
+            const li = document.createElement('li');
+            li.textContent = item;
+            ul.appendChild(li);
+          });
+          prosCol.appendChild(ul);
+          pc.appendChild(prosCol);
+        }
+
+        if (p.cons && p.cons.length) {
+          const consCol = document.createElement('div');
+          consCol.className = 'aff-cons';
+          const consTitle = document.createElement('div');
+          consTitle.className = 'aff-cons-title';
+          consTitle.textContent = 'Contras';
+          consCol.appendChild(consTitle);
+          const ul = document.createElement('ul');
+          p.cons.forEach((item: string) => {
+            const li = document.createElement('li');
+            li.textContent = item;
+            ul.appendChild(li);
+          });
+          consCol.appendChild(ul);
+          pc.appendChild(consCol);
+        }
+
+        info.appendChild(pc);
+      }
+
+      body.appendChild(info);
+      wrap.appendChild(body);
+
+      const ctaWrap = document.createElement('div');
+      ctaWrap.className = 'aff-cta-wrap';
+
+      const cta = document.createElement('a');
+      cta.className = 'aff-cta';
+      cta.href = appendTag(p.amazonUrl || '#');
+      cta.target = '_blank';
+      cta.rel = 'nofollow noopener sponsored';
+      cta.style.background = buttonColor;
+      cta.textContent = (p.buttonText || defaultButtonText) + ' →';
+      ctaWrap.appendChild(cta);
+
+      if (p.extraLinks && p.extraLinks.length > 0) {
+        p.extraLinks.forEach((link: { label: string; url: string }) => {
+          if (!link.label || !link.url) return;
+          const sec = document.createElement('a');
+          sec.className = 'aff-cta-secondary';
+          sec.href = link.url;
+          sec.target = '_blank';
+          sec.rel = 'nofollow noopener sponsored';
+          sec.textContent = link.label + ' →';
+          ctaWrap.appendChild(sec);
+        });
+      }
+
+      wrap.appendChild(ctaWrap);
+
+      return wrap;
+    }
+
+    function buildCompareCards(slugs: string[]): HTMLElement {
+      const grid = document.createElement('div');
+      grid.className = 'aff-compare-grid';
+
+      slugs.forEach(slug => {
+        const p = productMap[slug.trim()];
+        if (!p) return;
+
+        const card = document.createElement('div');
+        card.className = 'aff-compare-card';
+
+        if (p.image) {
+          const img = document.createElement('img');
+          img.src = p.image;
+          img.alt = p.title || '';
+          img.loading = 'lazy';
+          card.appendChild(img);
+        }
+
+        const body = document.createElement('div');
+        body.className = 'aff-compare-body';
+
+        const title = document.createElement('p');
+        title.className = 'aff-compare-title';
+        title.textContent = p.title || '';
+        body.appendChild(title);
+
+        if (showRatings && p.rating) {
+          const stars = document.createElement('div');
+          stars.className = 'aff-compare-stars';
+          stars.textContent = renderStars(p.rating) + ` ${Number(p.rating).toFixed(1)}`;
+          body.appendChild(stars);
+        }
+
+        if (showPrices && p.price) {
+          const price = document.createElement('div');
+          price.className = 'aff-compare-price';
+          price.textContent = p.price;
+          body.appendChild(price);
+        }
+
+        const cta = document.createElement('a');
+        cta.className = 'aff-compare-cta';
+        cta.href = appendTag(p.amazonUrl || '#');
+        cta.target = '_blank';
+        cta.rel = 'nofollow noopener sponsored';
+        cta.style.background = buttonColor;
+        cta.textContent = (p.buttonText || defaultButtonText) + ' →';
+        body.appendChild(cta);
+
+        if (p.extraLinks && p.extraLinks.length > 0) {
+          p.extraLinks.forEach((link: { label: string; url: string }) => {
+            if (!link.label || !link.url) return;
+            const sec = document.createElement('a');
+            sec.className = 'aff-compare-cta';
+            sec.href = link.url;
+            sec.target = '_blank';
+            sec.rel = 'nofollow noopener sponsored';
+            sec.style.background = '#fff';
+            sec.style.color = '#374151';
+            sec.style.border = '1.5px solid #e2e8f0';
+            sec.style.marginTop = '0.4rem';
+            sec.textContent = link.label + ' →';
+            body.appendChild(sec);
+          });
+        }
+
+        card.appendChild(body);
+        grid.appendChild(card);
+      });
+
+      return grid;
+    }
+
+    function processShortcodes() {
+      const postContent = document.querySelector('.post-content');
+      if (!postContent) return;
+
+      const html = postContent.innerHTML;
+      // Shortcodes can appear inside <p> tags — we need to replace the whole <p>
+      const singleRe = /\[affiliate:([a-z0-9_-]+)\]/gi;
+      const compareRe = /\[affiliate-compare:([a-z0-9_,\s-]+)\]/gi;
+
+      // Collect all paragraphs and scan them
+      const paragraphs = Array.from(postContent.querySelectorAll('p'));
+      let foundAny = false;
+
+      paragraphs.forEach(p => {
+        const text = p.textContent || '';
+
+        const singleMatch = text.match(/^\[affiliate:([a-z0-9_-]+)\]$/i);
+        if (singleMatch) {
+          const product = productMap[singleMatch[1]];
+          if (product) {
+            const box = buildProductBox(product);
+            p.replaceWith(box);
+            foundAny = true;
+            return;
+          }
+        }
+
+        const compareMatch = text.match(/^\[affiliate-compare:([a-z0-9_,\s-]+)\]$/i);
+        if (compareMatch) {
+          const slugs = compareMatch[1].split(',').map((s: string) => s.trim()).filter(Boolean);
+          const grid = buildCompareCards(slugs);
+          p.replaceWith(grid);
+          foundAny = true;
+          return;
+        }
+      });
+
+      // Also handle shortcodes not wrapped in <p> (raw text nodes)
+      // by scanning innerHTML as fallback
+      if (!foundAny) {
+        const newHtml = postContent.innerHTML
+          .replace(/\[affiliate-compare:([a-z0-9_,\s-]+)\]/gi, (_: string, slugs: string) => {
+            const grid = buildCompareCards(slugs.split(','));
+            return grid.outerHTML;
+          })
+          .replace(/\[affiliate:([a-z0-9_-]+)\]/gi, (_: string, slug: string) => {
+            const p = productMap[slug];
+            if (!p) return _;
+            return buildProductBox(p).outerHTML;
+          });
+        if (newHtml !== postContent.innerHTML) {
+          postContent.innerHTML = newHtml;
+          foundAny = true;
+        }
+      }
+
+      // Show disclaimer at top of post if there are affiliate products
+      if (foundAny && showDisclaimer && disclaimer) {
+        const disclaimerEl = document.createElement('div');
+        disclaimerEl.className = 'aff-post-disclaimer';
+        disclaimerEl.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>${disclaimer}</span>`;
+        postContent.insertAdjacentElement('beforebegin', disclaimerEl);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', processShortcodes);
+    } else {
+      processShortcodes();
+    }
+  })();
+  </script>
+)}

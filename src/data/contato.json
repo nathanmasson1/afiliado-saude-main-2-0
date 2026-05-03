@@ -1,0 +1,62 @@
+{
+  "seo": {
+    "title": "Contato",
+    "description": "Entre em contato com o SeuBlog. Tire dúvidas, sugira produtos para review ou proponha uma parceria.",
+    "image": ""
+  },
+  "hero": {
+    "label": "Contato",
+    "title": "Fale",
+    "titleAccent": "conosco",
+    "subtitle": "Tem uma dúvida, sugestão de produto ou quer propor uma parceria? Adoramos ouvir nossos leitores."
+  },
+  "methods": [
+    {
+      "icon": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z\"/><polyline points=\"22,6 12,13 2,6\"/></svg>",
+      "title": "E-mail",
+      "detail": "contato@seublog.com.br",
+      "description": "Respondemos em até 24 horas úteis."
+    },
+    {
+      "icon": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"2\" y=\"2\" width=\"20\" height=\"20\" rx=\"5\"/><circle cx=\"12\" cy=\"12\" r=\"5\"/><circle cx=\"17.5\" cy=\"6.5\" r=\"1.5\" fill=\"currentColor\" stroke=\"none\"/></svg>",
+      "title": "Instagram",
+      "detail": "@seublog",
+      "description": "Dicas rápidas e bastidores dos reviews."
+    },
+    {
+      "icon": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.43z\"/><polygon points=\"9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02\" fill=\"currentColor\" stroke=\"none\"/></svg>",
+      "title": "YouTube",
+      "detail": "SeuBlog Reviews",
+      "description": "Vídeo reviews e unboxings toda semana."
+    }
+  ],
+  "form": {
+    "title": "Envie uma mensagem",
+    "subtitle": "Preencha o formulário abaixo e retornaremos o mais breve possível.",
+    "nameLabel": "Nome",
+    "namePlaceholder": "Seu nome",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "seu@email.com",
+    "subjectLabel": "Assunto",
+    "subjectPlaceholder": "Selecione um assunto",
+    "subjects": [
+      { "value": "sugestao", "label": "Sugestão de produto" },
+      { "value": "duvida", "label": "Dúvida sobre um review" },
+      { "value": "parceria", "label": "Proposta de parceria" },
+      { "value": "outro", "label": "Outro" }
+    ],
+    "messageLabel": "Mensagem",
+    "messagePlaceholder": "Sua mensagem...",
+    "submitText": "Enviar Mensagem",
+    "successText": "Mensagem enviada!"
+  },
+  "faq": {
+    "title": "Perguntas Frequentes",
+    "items": [
+      { "q": "Vocês testam todos os produtos que recomendam?", "a": "Sim. Cada produto é testado por no mínimo 7 dias antes de publicarmos um review. Em alguns casos, acompanhamos o produto por semanas." },
+      { "q": "Como vocês ganham dinheiro?", "a": "Através de links de afiliado. Quando você compra um produto pelo nosso link, recebemos uma pequena comissão sem custo adicional para você. Isso nos permite manter o blog 100% gratuito." },
+      { "q": "Posso sugerir um produto para review?", "a": "Claro! Use o formulário abaixo ou mande um e-mail. Priorizamos produtos mais pedidos pela nossa comunidade." },
+      { "q": "Vocês fazem parcerias com marcas?", "a": "Fazemos parcerias editoriais com marcas, mas nunca comprometemos nossa opinião. Todo conteúdo patrocinado é claramente identificado." }
+    ]
+  }
+}

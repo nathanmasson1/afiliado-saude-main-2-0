@@ -1,0 +1,162 @@
+---
+/**
+ * EmailPopup.astro — Popup de captura de email (plug-and-play)
+ *
+ * Lê config de pluginsConfig.json no build-time.
+ * Se popup.enabled = false, não renderiza nada.
+ * Injetado no BaseLayout.astro antes do </body>.
+ */
+import { readData } from '../../lib/readData';
+
+const pluginsConfig = readData('pluginsConfig.json', {}) as any;
+const popupConfig = pluginsConfig?.emailList?.popup;
+
+const enabled = popupConfig?.enabled === true;
+
+const headline = popupConfig?.headline || 'Não perca nenhum artigo!';
+const subheadline = popupConfig?.subheadline || 'Receba os melhores conteúdos direto no seu e-mail.';
+const triggerType = popupConfig?.triggerType || 'delay';
+const triggerValue = Number(popupConfig?.triggerValue ?? 5);
+const showOnce = popupConfig?.showOnce !== false;
+---
+
+{enabled && (
+<div id="email-popup-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:99999; align-items:center; justify-content:center;">
+    <div id="email-popup-card" style="background:#fff; border-radius:1.25rem; padding:2rem; max-width:420px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.25); position:relative; animation:popupFadeIn 0.35s ease;">
+        <!-- Fechar -->
+        <button id="email-popup-close" type="button" aria-label="Fechar" style="position:absolute; top:1rem; right:1rem; background:none; border:none; cursor:pointer; color:#94a3b8; font-size:1.25rem; line-height:1; padding:0.25rem;">✕</button>
+
+        <!-- Ícone -->
+        <div style="width:3rem; height:3rem; background:linear-gradient(135deg,#7c3aed,#a855f7); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem;">
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+        </div>
+
+        <!-- Textos -->
+        <h3 style="text-align:center; font-size:1.2rem; font-weight:700; color:#1e293b; margin:0 0 0.5rem;">{headline}</h3>
+        <p style="text-align:center; font-size:0.875rem; color:#64748b; margin:0 0 1.5rem; line-height:1.5;">{subheadline}</p>
+
+        <!-- Form -->
+        <form id="email-popup-form" style="display:flex; flex-direction:column; gap:0.625rem;">
+            <input
+                id="email-popup-input"
+                type="email"
+                placeholder="Seu melhor e-mail"
+                required
+                style="width:100%; padding:0.75rem 1rem; border:1.5px solid #e2e8f0; border-radius:0.75rem; font-size:0.875rem; outline:none; box-sizing:border-box; transition:border-color 0.2s;"
+                onfocus="this.style.borderColor='#7c3aed'"
+                onblur="this.style.borderColor='#e2e8f0'"
+            />
+            <button
+                id="email-popup-btn"
+                type="submit"
+                style="width:100%; padding:0.75rem; background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; border:none; border-radius:0.75rem; font-size:0.875rem; font-weight:700; cursor:pointer; transition:opacity 0.2s;"
+            >
+                Inscrever-se
+            </button>
+        </form>
+
+        <!-- Mensagem de feedback -->
+        <p id="email-popup-msg" style="display:none; text-align:center; margin-top:0.75rem; font-size:0.8rem; font-weight:600;"></p>
+    </div>
+</div>
+
+<style>
+@keyframes popupFadeIn {
+    from { opacity:0; transform:scale(0.95) translateY(10px); }
+    to   { opacity:1; transform:scale(1) translateY(0); }
+}
+</style>
+
+<script define:vars={{ triggerType, triggerValue, showOnce }}>
+(function() {
+    const STORAGE_KEY = 'email_popup_dismissed';
+
+    function shouldShow() {
+        if (!showOnce) return true;
+        return !localStorage.getItem(STORAGE_KEY);
+    }
+
+    function showPopup() {
+        if (!shouldShow()) return;
+        const overlay = document.getElementById('email-popup-overlay');
+        if (overlay) {
+            overlay.style.display = 'flex';
+        }
+    }
+
+    function hidePopup() {
+        const overlay = document.getElementById('email-popup-overlay');
+        if (overlay) overlay.style.display = 'none';
+        if (showOnce) localStorage.setItem(STORAGE_KEY, '1');
+    }
+
+    // Trigger
+    if (triggerType === 'delay') {
+        setTimeout(showPopup, triggerValue * 1000);
+    } else if (triggerType === 'scroll') {
+        function onScroll() {
+            const scrolled = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+            if (scrolled >= triggerValue) {
+                showPopup();
+                window.removeEventListener('scroll', onScroll);
+            }
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+    }
+
+    // Fechar ao clicar no X
+    document.getElementById('email-popup-close')?.addEventListener('click', hidePopup);
+
+    // Fechar ao clicar fora do card
+    document.getElementById('email-popup-overlay')?.addEventListener('click', function(e) {
+        if (e.target === this) hidePopup();
+    });
+
+    // Submit do form
+    document.getElementById('email-popup-form')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const input = document.getElementById('email-popup-input');
+        const btn = document.getElementById('email-popup-btn');
+        const msg = document.getElementById('email-popup-msg');
+        const email = input?.value?.trim();
+        if (!email) return;
+
+        btn.textContent = 'Enviando...';
+        btn.disabled = true;
+        msg.style.display = 'none';
+
+        try {
+            const res = await fetch('/api/subscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, source: 'popup' }),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                msg.textContent = data.message || 'Inscrito com sucesso!';
+                msg.style.color = '#16a34a';
+                msg.style.display = 'block';
+                input.value = '';
+                if (showOnce) localStorage.setItem(STORAGE_KEY, '1');
+                setTimeout(hidePopup, 2000);
+            } else {
+                msg.textContent = data.error || 'Erro ao inscrever.';
+                msg.style.color = '#dc2626';
+                msg.style.display = 'block';
+                btn.textContent = 'Inscrever-se';
+                btn.disabled = false;
+            }
+        } catch {
+            msg.textContent = 'Erro de rede. Tente novamente.';
+            msg.style.color = '#dc2626';
+            msg.style.display = 'block';
+            btn.textContent = 'Inscrever-se';
+            btn.disabled = false;
+        }
+    });
+})();
+</script>
+)}

@@ -1,0 +1,215 @@
+---
+import '../styles/global.css';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+
+interface Product {
+  name: string;
+  price?: string;
+  affiliateLink: string;
+  rating?: number;
+  image?: string;
+}
+
+interface Breadcrumb {
+  name: string;
+  url: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  canonicalURL?: string;
+  type?: 'website' | 'article';
+  pubDate?: Date;
+  updatedDate?: Date;
+  author?: string;
+  rating?: number;
+  products?: Product[];
+  breadcrumbs?: Breadcrumb[];
+}
+
+const {
+  title,
+  description,
+  image = '/images/og-default.jpg',
+  canonicalURL = Astro.url.href,
+  type = 'website',
+  pubDate,
+  updatedDate,
+  author = 'SeuBlog',
+  rating,
+  products = [],
+  breadcrumbs = [],
+} = Astro.props;
+
+const siteName = 'Seu Blog';
+const fullTitle = `${title} | ${siteName}`;
+
+// Build JSON-LD
+const mainSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': type === 'article' ? 'BlogPosting' : 'WebSite',
+  name: fullTitle,
+  headline: title,
+  description,
+  url: canonicalURL,
+  publisher: {
+    '@type': 'Organization',
+    name: siteName,
+    url: Astro.site?.toString(),
+  },
+};
+
+if (type === 'article') {
+  if (pubDate) mainSchema.datePublished = pubDate.toISOString();
+  if (updatedDate) mainSchema.dateModified = updatedDate.toISOString();
+  if (image) mainSchema.image = new URL(image, Astro.site).toString();
+  mainSchema.author = { '@type': 'Person', name: author };
+  mainSchema.mainEntityOfPage = { '@type': 'WebPage', '@id': canonicalURL };
+
+  if (rating) {
+    mainSchema.review = {
+      '@type': 'Review',
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: rating,
+        bestRating: 10,
+      },
+      author: { '@type': 'Person', name: author },
+    };
+  }
+}
+
+// Product schemas
+const productSchemas = products.filter(p => p.name).map((p) => {
+  const schema: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: p.name,
+    ...(p.image ? { image: new URL(p.image, Astro.site).toString() } : {}),
+    ...(p.rating ? {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: p.rating,
+        bestRating: 5,
+        ratingCount: 1,
+      },
+    } : {}),
+    offers: {
+      '@type': 'Offer',
+      url: p.affiliateLink,
+      priceCurrency: 'BRL',
+      availability: 'https://schema.org/InStock',
+      ...(p.price ? { price: p.price.replace(/[^\d,.]/g, '').replace(',', '.') } : {}),
+    },
+  };
+  return schema;
+});
+
+// Breadcrumb schema
+const breadcrumbSchema = breadcrumbs.length > 0 ? {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: breadcrumbs.map((crumb, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: crumb.name,
+    item: new URL(crumb.url, Astro.site).toString(),
+  })),
+} : null;
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Primary Meta Tags -->
+    <title>{fullTitle}</title>
+    <meta name="title" content={fullTitle} />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    {author && <meta name="author" content={author} />}
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, Astro.site)} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:locale" content="pt_BR" />
+    {pubDate && <meta property="article:published_time" content={pubDate.toISOString()} />}
+    {updatedDate && <meta property="article:modified_time" content={updatedDate.toISOString()} />}
+    {author && <meta property="article:author" content={author} />}
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(image, Astro.site)} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <!-- Fonts — Instrument Serif (display) + Outfit (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- RSS -->
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={siteName}
+      href={new URL('/rss.xml', Astro.site)}
+    />
+
+    <!-- JSON-LD: Main Schema -->
+    <script type="application/ld+json" set:html={JSON.stringify(mainSchema)} />
+
+    <!-- JSON-LD: Breadcrumbs -->
+    {breadcrumbSchema && (
+      <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+    )}
+
+    <!-- JSON-LD: Products -->
+    {productSchemas.map((schema) => (
+      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ))}
+  </head>
+  <body class="grain">
+    <Navbar />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+      );
+
+      document.querySelectorAll('.animate-on-scroll, .stagger-children').forEach((el) => {
+        observer.observe(el);
+      });
+    </script>
+  </body>
+</html>

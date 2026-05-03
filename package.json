@@ -1,0 +1,32 @@
+{
+  "name": "blog-youtube",
+  "version": "1.0.0",
+  "description": "Blog de afiliados - produtos físicos e digitais",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@astrojs/react": "^5.0.4",
+    "@astrojs/rss": "^4.0.18",
+    "@astrojs/sitemap": "^3.7.2",
+    "@astrojs/tailwind": "^6.0.2",
+    "@astrojs/vercel": "^10.0.6",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "astro": "^6.1.10",
+    "fast-xml-parser": "^5.7.2",
+    "lucide-react": "^1.14.0",
+    "marked": "^18.0.2",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-quill-new": "^3.8.3",
+    "tailwindcss": "^3.4.19"
+  }
+}

@@ -1,0 +1,41 @@
+---
+export const prerender = false;
+import AdminNav from '../components/admin/AdminNav';
+import AiWarningBanner from '../components/admin/AiWarningBanner';
+import CmsToaster from '../components/admin/CmsToaster';
+import '../styles/admin.css';
+
+interface Props {
+    title?: string;
+    activeSection?: string;
+}
+const { title = 'Admin', activeSection = '' } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} — Admin</title>
+    <style>
+        /* Quill override */
+        .ql-toolbar { border-radius: 8px 8px 0 0 !important; border-color: #e2e8f0 !important; }
+        .ql-container { border-radius: 0 0 8px 8px !important; border-color: #e2e8f0 !important; min-height: 300px; }
+        .ql-editor { font-size: 15px; line-height: 1.7; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <AdminNav client:load activeSection={activeSection} />
+        <!-- Main Content -->
+        <main class="flex-1 min-w-0 ml-64">
+            <AiWarningBanner client:load />
+            <div class="p-8">
+                <slot />
+            </div>
+        </main>
+    </div>
+    <CmsToaster client:load />
+</body>
+</html>

@@ -1,0 +1,420 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { readData } from '../lib/readData';
+
+const contato = readData('contato.json') || {};
+const seo = contato.seo || {};
+const hero = contato.hero || {};
+const contactMethods = contato.methods || [];
+const form = contato.form || {};
+const faqSec = contato.faq || {};
+const faqs = faqSec.items || [];
+const subjects = form.subjects || [];
+---
+
+<BaseLayout
+  title={seo.title || 'Contato'}
+  description={seo.description || 'Entre em contato com o SeuBlog. Tire dúvidas, sugira produtos para review ou proponha uma parceria.'}
+  image={seo.image || undefined}
+>
+  {/* FAQ Schema */}
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.a,
+      },
+    })),
+  })} />
+
+  <!-- Hero -->
+  <section class="contact-hero">
+    <div class="contact-hero-bg"></div>
+    <div class="container contact-hero-inner">
+      <span class="section-label">{hero.label || 'Contato'}</span>
+      <h1 class="contact-hero-title">
+        {hero.title || 'Fale'}
+        <span class="contact-hero-accent">{hero.titleAccent || 'conosco'}</span>
+      </h1>
+      <p class="contact-hero-subtitle">{hero.subtitle}</p>
+    </div>
+  </section>
+
+  <!-- Contact Methods -->
+  <section class="contact-methods">
+    <div class="container">
+      <div class="methods-grid stagger-children animate-on-scroll">
+        {contactMethods.map((method: any) => (
+          <div class="method-card">
+            <div class="method-icon" set:html={method.icon} />
+            <h3 class="method-title">{method.title}</h3>
+            <span class="method-detail">{method.detail}</span>
+            <p class="method-description">{method.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Form + FAQ -->
+  <section class="contact-main section">
+    <div class="container">
+      <div class="contact-grid">
+        <!-- Form -->
+        <div class="contact-form-wrapper animate-on-scroll">
+          <h2 class="contact-form-title">{form.title || 'Envie uma mensagem'}</h2>
+          <p class="contact-form-subtitle">{form.subtitle}</p>
+
+          <form class="contact-form" id="contactForm" data-success-text={form.successText || 'Mensagem enviada!'}>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="name" class="form-label">{form.nameLabel || 'Nome'}</label>
+                <input type="text" id="name" name="name" class="form-input" placeholder={form.namePlaceholder || 'Seu nome'} required />
+              </div>
+              <div class="form-group">
+                <label for="email" class="form-label">{form.emailLabel || 'E-mail'}</label>
+                <input type="email" id="email" name="email" class="form-input" placeholder={form.emailPlaceholder || 'seu@email.com'} required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="subject" class="form-label">{form.subjectLabel || 'Assunto'}</label>
+              <select id="subject" name="subject" class="form-input form-select" required>
+                <option value="" disabled selected>{form.subjectPlaceholder || 'Selecione um assunto'}</option>
+                {subjects.map((s: any) => (
+                  <option value={s.value}>{s.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="message" class="form-label">{form.messageLabel || 'Mensagem'}</label>
+              <textarea id="message" name="message" class="form-input form-textarea" placeholder={form.messagePlaceholder || 'Sua mensagem...'} rows="5" required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">
+              {form.submitText || 'Enviar Mensagem'}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            </button>
+          </form>
+        </div>
+
+        <!-- FAQ -->
+        <div class="contact-faq animate-on-scroll">
+          <h2 class="faq-title">{faqSec.title || 'Perguntas Frequentes'}</h2>
+          <div class="faq-list">
+            {faqs.map((faq: any) => (
+              <details class="faq-item">
+                <summary class="faq-question">{faq.q}</summary>
+                <p class="faq-answer">{faq.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Hero */
+  .contact-hero {
+    position: relative;
+    padding: calc(var(--navbar-height) + var(--space-4xl)) 0 var(--space-4xl);
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .contact-hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 30%, rgba(216, 243, 220, 0.4) 0%, transparent 70%),
+      var(--color-bg-warm);
+    z-index: -1;
+  }
+
+  .contact-hero-title {
+    font-family: var(--font-heading);
+    font-size: var(--fs-5xl);
+    font-weight: var(--fw-extrabold);
+    letter-spacing: -0.03em;
+    margin-bottom: var(--space-xl);
+    line-height: var(--lh-tight);
+  }
+
+  .contact-hero-accent {
+    font-family: var(--font-display);
+    font-weight: var(--fw-regular);
+    font-style: italic;
+    color: var(--color-primary);
+  }
+
+  .contact-hero-subtitle {
+    font-size: var(--fs-lg);
+    color: var(--color-text-muted);
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: var(--lh-relaxed);
+    font-weight: var(--fw-light);
+  }
+
+  /* Contact Methods */
+  .contact-methods {
+    padding: var(--space-3xl) 0;
+    background: var(--color-bg);
+  }
+
+  .methods-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .method-card {
+    text-align: center;
+    padding: var(--space-2xl);
+    background: var(--color-bg-warm);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border-light);
+    transition: all var(--transition-base);
+    animation: fadeInUp 500ms var(--ease-out-expo) both;
+  }
+
+  .method-card:hover {
+    border-color: var(--color-border);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
+  }
+
+  .method-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-lg);
+    background: var(--color-primary-surface);
+    color: var(--color-primary);
+    margin-bottom: var(--space-lg);
+  }
+
+  .method-title {
+    font-size: var(--fs-base);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-tight);
+    margin-bottom: var(--space-xs);
+  }
+
+  .method-detail {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--color-primary);
+    display: block;
+    margin-bottom: var(--space-sm);
+  }
+
+  .method-description {
+    font-size: var(--fs-xs);
+    color: var(--color-text-faint);
+    font-weight: var(--fw-light);
+  }
+
+  /* Main section */
+  .contact-main {
+    background: var(--color-bg-warm);
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: var(--space-4xl);
+    align-items: start;
+  }
+
+  /* Form */
+  .contact-form-title {
+    font-family: var(--font-heading);
+    font-size: var(--fs-2xl);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-tight);
+    margin-bottom: var(--space-sm);
+    text-align: left;
+  }
+
+  .contact-form-subtitle {
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-2xl);
+    font-weight: var(--fw-light);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+  }
+
+  .form-group {
+    margin-bottom: var(--space-lg);
+  }
+
+  .form-label {
+    display: block;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wider);
+    margin-bottom: var(--space-sm);
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 0.85rem 1.15rem;
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-light);
+    color: var(--color-text);
+    background: var(--color-bg-pure);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    outline: none;
+  }
+
+  .form-input::placeholder {
+    color: var(--color-text-faint);
+  }
+
+  .form-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.08);
+  }
+
+  .form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8a8a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .btn-full {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* FAQ */
+  .faq-title {
+    font-family: var(--font-heading);
+    font-size: var(--fs-2xl);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-tight);
+    margin-bottom: var(--space-xl);
+    text-align: left;
+  }
+
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .faq-item {
+    background: var(--color-bg-pure);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: all var(--transition-base);
+  }
+
+  .faq-item[open] {
+    border-color: var(--color-border);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .faq-question {
+    padding: var(--space-lg) var(--space-xl);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--color-text);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    transition: color var(--transition-fast);
+  }
+
+  .faq-question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-question::after {
+    content: '+';
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-light);
+    color: var(--color-text-faint);
+    flex-shrink: 0;
+    transition: transform var(--transition-base);
+  }
+
+  .faq-item[open] .faq-question::after {
+    transform: rotate(45deg);
+    color: var(--color-primary);
+  }
+
+  .faq-question:hover {
+    color: var(--color-primary);
+  }
+
+  .faq-answer {
+    padding: 0 var(--space-xl) var(--space-lg);
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+    line-height: var(--lh-relaxed);
+    font-weight: var(--fw-light);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .methods-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .contact-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-3xl);
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const form = document.getElementById('contactForm');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const btn = form.querySelector('button[type="submit"]');
+    if (btn) {
+      const successText = form.getAttribute('data-success-text') || 'Mensagem enviada!';
+      btn.textContent = successText;
+      btn.setAttribute('disabled', 'true');
+      btn.style.opacity = '0.7';
+    }
+  });
+</script>

@@ -1,0 +1,39 @@
+{
+  "name": "SeuBlog",
+  "description": "Reviews honestos e recomendações dos melhores produtos físicos e digitais do mercado.",
+  "url": "https://meublog.com.br",
+  "author": "SeuBlog",
+  "language": "pt-BR",
+  "logo": "",
+  "logoMark": "S",
+  "ctaText": "Explorar",
+  "ctaHref": "/blog",
+  "theme": {
+    "primary": "#1b4332",
+    "accent": "#c9a227",
+    "font": "poppins",
+    "dark": "#1E293B"
+  },
+  "social": {
+    "instagram": "",
+    "twitter": "",
+    "facebook": "",
+    "pinterest": "",
+    "youtube": ""
+  },
+  "contact": {
+    "email": "contato@seublog.com.br",
+    "phone": "",
+    "address": "",
+    "name": ""
+  },
+  "legal": {
+    "terms_last_updated": "",
+    "privacy_last_updated": ""
+  },
+  "phone": "",
+  "address": "",
+  "ai": {
+    "openaiKey": ""
+  }
+}

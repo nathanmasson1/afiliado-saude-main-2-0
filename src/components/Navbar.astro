@@ -1,0 +1,292 @@
+---
+import { readData } from '../lib/readData';
+
+const site = readData('siteConfig.json') || {};
+const menu = readData('menu.json') || {};
+const navLinks = (menu.items && menu.items.length > 0) ? menu.items : [
+  { href: '/', label: 'Home' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/sobre', label: 'Sobre' },
+  { href: '/contato', label: 'Contato' },
+];
+
+const siteName = site.name || 'SeuBlog';
+const siteLogo = site.logo || '';
+const logoMark = (site.logoMark || siteName.charAt(0) || 'S').toUpperCase();
+const ctaText = site.ctaText || 'Explorar';
+const ctaHref = site.ctaHref || '/blog';
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="navbar" id="navbar">
+  <div class="container navbar-inner">
+    <a href="/" class="navbar-logo">
+      {siteLogo ? (
+        <img src={siteLogo} alt={siteName} class="logo-image" />
+      ) : (
+        <>
+          <span class="logo-mark">{logoMark}</span>
+          <span class="logo-text">{siteName}</span>
+        </>
+      )}
+    </a>
+
+    <nav class="navbar-nav" id="navMenu">
+      <ul class="navbar-links">
+        {navLinks.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class:list={['navbar-link', { active: currentPath === link.href }]}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="navbar-actions">
+      <a href={ctaHref} class="btn btn-primary btn-nav">{ctaText}</a>
+      <button
+        class="navbar-toggle"
+        id="navToggle"
+        aria-label="Abrir menu de navegação"
+        aria-expanded="false"
+      >
+        <span class="hamburger"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: rgba(254, 252, 249, 0.92);
+    backdrop-filter: blur(20px) saturate(1.8);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    transition: all var(--transition-base);
+  }
+
+  .navbar.scrolled {
+    box-shadow: 0 1px 0 var(--color-border-light), var(--shadow-sm);
+  }
+
+  .navbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--navbar-height);
+  }
+
+  /* Logo */
+  .navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    text-decoration: none;
+    position: relative;
+  }
+
+  .navbar-logo:hover {
+    color: var(--color-text);
+  }
+
+  .logo-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--color-primary);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-style: italic;
+    border-radius: var(--radius-md);
+    transition: transform var(--transition-fast);
+  }
+
+  .navbar-logo:hover .logo-mark {
+    transform: rotate(-4deg) scale(1.05);
+  }
+
+  .logo-text {
+    font-family: var(--font-heading);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+    color: var(--color-text);
+    letter-spacing: var(--ls-tight);
+  }
+
+  .logo-image {
+    height: 36px;
+    width: auto;
+    display: block;
+  }
+
+  /* Nav links */
+  .navbar-links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .navbar-link {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--color-text-secondary);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    transition: all var(--transition-fast);
+    position: relative;
+  }
+
+  .navbar-link:hover {
+    color: var(--color-primary);
+    background: var(--color-primary-glow);
+  }
+
+  .navbar-link.active {
+    color: var(--color-primary);
+    font-weight: var(--fw-semibold);
+    background: var(--color-primary-surface);
+  }
+
+  /* CTA */
+  .btn-nav {
+    padding: 0.55rem 1.5rem;
+    font-size: var(--fs-xs);
+    border-radius: var(--radius-full);
+  }
+
+  .navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  /* Hamburger */
+  .navbar-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--space-sm);
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    transition: background var(--transition-fast);
+  }
+
+  .navbar-toggle:hover {
+    background: var(--color-primary-glow);
+  }
+
+  .hamburger {
+    display: block;
+    width: 20px;
+    height: 1.5px;
+    background-color: var(--color-text);
+    position: relative;
+    transition: background-color var(--transition-fast);
+    margin: 0 auto;
+  }
+
+  .hamburger::before,
+  .hamburger::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 20px;
+    height: 1.5px;
+    background-color: var(--color-text);
+    transition: transform var(--transition-base);
+  }
+
+  .hamburger::before { top: -6px; }
+  .hamburger::after { top: 6px; }
+
+  .navbar-toggle.active .hamburger {
+    background-color: transparent;
+  }
+
+  .navbar-toggle.active .hamburger::before {
+    transform: rotate(45deg) translate(4px, 4px);
+  }
+
+  .navbar-toggle.active .hamburger::after {
+    transform: rotate(-45deg) translate(4px, -4px);
+  }
+
+  @media (max-width: 768px) {
+    .navbar-toggle {
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar-nav {
+      position: fixed;
+      top: var(--navbar-height);
+      left: 0;
+      width: 100%;
+      background-color: rgba(254, 252, 249, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-lg);
+      transform: translateY(-110%);
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--transition-base);
+    }
+
+    .navbar-nav.open {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .navbar-links {
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .navbar-link {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+    }
+
+    .navbar-actions .btn {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const navbar = document.getElementById('navbar');
+  const navToggle = document.getElementById('navToggle');
+  const navMenu = document.getElementById('navMenu');
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 20) {
+      navbar?.classList.add('scrolled');
+    } else {
+      navbar?.classList.remove('scrolled');
+    }
+  });
+
+  navToggle?.addEventListener('click', () => {
+    navToggle.classList.toggle('active');
+    navMenu?.classList.toggle('open');
+    const expanded = navToggle.getAttribute('aria-expanded') === 'true';
+    navToggle.setAttribute('aria-expanded', String(!expanded));
+  });
+</script>

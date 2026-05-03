@@ -1,0 +1,12 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import MenuEditor from '../../components/admin/MenuEditor';
+---
+<AdminLayout title="Menu" activeSection="menu">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-slate-900">Menu de Navegação</h1>
+        <p class="text-slate-500 mt-1">Edite os itens do menu do cabeçalho do site.</p>
+    </div>
+    <MenuEditor client:load />
+</AdminLayout>

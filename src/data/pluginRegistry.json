@@ -1,0 +1,119 @@
+[
+  {
+    "name": "google-tag",
+    "label": "Google Tag",
+    "description": "Configure todas as tags do Google (Analytics, Ads, Tag Manager) em um so lugar.",
+    "icon": "Tag",
+    "color": "text-blue-600",
+    "bg": "bg-blue-50",
+    "href": "/admin/google-tag"
+  },
+  {
+    "name": "meta-pixel",
+    "label": "Meta Pixel",
+    "description": "Rastreie conversões e audiência com o Facebook/Meta Pixel.",
+    "icon": "Target",
+    "color": "text-blue-600",
+    "bg": "bg-blue-50",
+    "href": "/admin/meta-pixel"
+  },
+  {
+    "name": "adsense",
+    "label": "Google AdSense",
+    "description": "Monetize seu blog com anúncios automáticos do Google AdSense.",
+    "icon": "DollarSign",
+    "color": "text-yellow-600",
+    "bg": "bg-yellow-50",
+    "href": "/admin/adsense"
+  },
+  {
+    "name": "social-share",
+    "label": "Compartilhamento Social",
+    "description": "Adicione botões de share nos artigos para Facebook, WhatsApp e mais.",
+    "icon": "Share2",
+    "color": "text-pink-600",
+    "bg": "bg-pink-50",
+    "href": "/admin/social-share"
+  },
+  {
+    "name": "seo",
+    "label": "SEO Toolkit",
+    "description": "Gere JSON-LD structured data e veja o score de SEO de cada artigo.",
+    "icon": "SearchCheck",
+    "color": "text-emerald-600",
+    "bg": "bg-emerald-50",
+    "href": "/admin/seo"
+  },
+  {
+    "name": "related-posts",
+    "label": "Related Posts",
+    "description": "Exibe posts relacionados por categoria ao final de cada artigo.",
+    "icon": "BookOpen",
+    "color": "text-indigo-600",
+    "bg": "bg-indigo-50",
+    "href": "/admin/plugins"
+  },
+  {
+    "name": "email-list",
+    "label": "Lista de Emails",
+    "description": "Capture leads com popups e formulários inline integrados ao Brevo.",
+    "icon": "Mail",
+    "color": "text-sky-600",
+    "bg": "bg-sky-50",
+    "href": "/admin/email-list"
+  },
+  {
+    "name": "cookie-consent",
+    "label": "Cookie Consent / LGPD",
+    "description": "Exiba o banner de cookies e bloqueie GA/Pixel até o consentimento.",
+    "icon": "Cookie",
+    "color": "text-amber-600",
+    "bg": "bg-amber-50",
+    "href": "/admin/cookie-consent"
+  },
+  {
+    "name": "redirects",
+    "label": "Gerenciar Redirects",
+    "description": "Crie redirects 301/302 para migração de URLs e campanhas.",
+    "icon": "ArrowRightLeft",
+    "color": "text-indigo-600",
+    "bg": "bg-indigo-50",
+    "href": "/admin/redirects"
+  },
+  {
+    "name": "affiliates",
+    "label": "Amazon Affiliates",
+    "description": "Gerencie produtos e links de afiliado Amazon com blocos visuais.",
+    "icon": "ShoppingCart",
+    "color": "text-rose-600",
+    "bg": "bg-rose-50",
+    "href": "/admin/affiliates"
+  },
+  {
+    "name": "ai-generator",
+    "label": "Gerar Posts com IA",
+    "description": "Crie artigos completos com inteligência artificial e imagens automáticas.",
+    "icon": "Sparkles",
+    "color": "text-violet-600",
+    "bg": "bg-violet-50",
+    "href": "/admin/ai"
+  },
+  {
+    "name": "search-console",
+    "label": "Search Console",
+    "description": "Conecte o Google Search Console e veja o desempenho do seu site.",
+    "icon": "Search",
+    "color": "text-green-600",
+    "bg": "bg-green-50",
+    "href": "/admin/search-console"
+  },
+  {
+    "name": "wp-importer",
+    "label": "Importar WordPress",
+    "description": "Migre todos os posts do WordPress para o Walker em um clique.",
+    "icon": "Upload",
+    "color": "text-slate-600",
+    "bg": "bg-slate-100",
+    "href": "/admin/import-wp"
+  }
+]

@@ -1,0 +1,12 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import SettingsSEO from '../../plugins/seo/SettingsSEO';
+---
+<AdminLayout title="SEO Toolkit" activeSection="seo">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-slate-900">SEO Toolkit</h1>
+        <p class="text-slate-500 mt-1">Configure dados estruturados (JSON-LD) para melhorar o ranqueamento nos motores de busca.</p>
+    </div>
+    <SettingsSEO client:load />
+</AdminLayout>

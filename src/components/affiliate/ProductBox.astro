@@ -1,0 +1,532 @@
+---
+import RatingStars from './RatingStars.astro';
+
+interface Props {
+  name: string;
+  description?: string;
+  price?: string;
+  originalPrice?: string;
+  rating?: number;
+  affiliateLink: string;
+  store?: string;
+  image?: string;
+  badge?: string;
+  variant?: 'featured' | 'compact';
+}
+
+const {
+  name,
+  description,
+  price,
+  originalPrice,
+  rating,
+  affiliateLink,
+  store = 'outro',
+  image,
+  badge,
+  variant = 'featured',
+} = Astro.props;
+
+const storeLabels: Record<string, string> = {
+  'amazon': 'Ver Melhor Preço na Amazon',
+  'hotmart': 'Acessar Curso Agora',
+  'eduzz': 'Acessar Produto',
+  'monetizze': 'Acessar Produto',
+  'mercado-livre': 'Ver no Mercado Livre',
+  'shopee': 'Ver na Shopee',
+  'outro': 'Ver Oferta',
+};
+
+const storeNames: Record<string, string> = {
+  'amazon': 'Disponível na Amazon',
+  'hotmart': 'Disponível na Hotmart',
+  'eduzz': 'Disponível na Eduzz',
+  'monetizze': 'Disponível na Monetizze',
+  'mercado-livre': 'Disponível no Mercado Livre',
+  'shopee': 'Disponível na Shopee',
+  'outro': '',
+};
+
+const ctaLabel = storeLabels[store] || 'Ver Oferta';
+const storeName = storeNames[store] || '';
+
+const discount = originalPrice && price
+  ? Math.round((1 - parseFloat(price.replace(/[^\d]/g, '')) / parseFloat(originalPrice.replace(/[^\d]/g, ''))) * 100)
+  : null;
+
+const ratingLabel = rating
+  ? rating >= 4.5 ? 'Excelente' : rating >= 4 ? 'Muito Bom' : rating >= 3.5 ? 'Bom' : 'Regular'
+  : null;
+---
+
+{variant === 'featured' ? (
+  <div class="product-box product-box-featured">
+    {/* Top bar */}
+    <div class="product-top-bar">
+      <div class="product-top-bar-inner">
+        {badge && (
+          <span class="product-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            {badge}
+          </span>
+        )}
+        {storeName && <span class="product-store">{storeName}</span>}
+      </div>
+    </div>
+
+    <div class="product-box-inner">
+      {/* Left: Image */}
+      <div class="product-visual">
+        {image ? (
+          <div class="product-image">
+            <img src={image} alt={name} loading="lazy" />
+          </div>
+        ) : (
+          <div class="product-image product-image-placeholder">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.15"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke-width="1.5"/></svg>
+          </div>
+        )}
+        {rating && (
+          <div class="product-score">
+            <span class="product-score-number">{rating.toFixed(1)}</span>
+            <span class="product-score-label">{ratingLabel}</span>
+            <RatingStars rating={rating} size="sm" />
+          </div>
+        )}
+      </div>
+
+      {/* Right: Details */}
+      <div class="product-details">
+        <h3 class="product-name">{name}</h3>
+
+        {description && (
+          <p class="product-description">{description}</p>
+        )}
+
+        <div class="product-pricing">
+          {originalPrice && (
+            <span class="product-original-price">
+              De <s>{originalPrice}</s>
+            </span>
+          )}
+          <div class="product-price-row">
+            {price && <span class="product-price">{price}</span>}
+            {discount && discount > 0 && (
+              <span class="product-discount">-{discount}%</span>
+            )}
+          </div>
+        </div>
+
+        <div class="product-cta-area">
+          <a href={affiliateLink} class="product-cta-btn" target="_blank" rel="sponsored noopener">
+            <span class="product-cta-text">{ctaLabel}</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <span class="product-cta-note">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Compra segura · Link verificado
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+) : (
+  <div class="product-box product-box-compact">
+    <div class="product-compact-inner">
+      {image && (
+        <div class="product-compact-img">
+          <img src={image} alt={name} loading="lazy" />
+        </div>
+      )}
+      <div class="product-compact-info">
+        <div class="product-compact-top">
+          {badge && <span class="product-compact-badge">{badge}</span>}
+          <h4 class="product-compact-name">{name}</h4>
+        </div>
+        <div class="product-compact-meta">
+          {price && <span class="product-compact-price">{price}</span>}
+          {rating && <RatingStars rating={rating} size="sm" />}
+        </div>
+      </div>
+      <a href={affiliateLink} class="product-compact-cta" target="_blank" rel="sponsored noopener">
+        Ver Oferta
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+      </a>
+    </div>
+  </div>
+)}
+
+<style>
+  /* ========== FEATURED ========== */
+  .product-box-featured {
+    position: relative;
+    background: var(--color-bg-pure);
+    border: 1.5px solid var(--color-accent-light);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    margin: var(--space-2xl) 0;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+  }
+
+  .product-box-featured:hover {
+    box-shadow: var(--shadow-xl), 0 0 0 1px var(--color-accent-light);
+    transform: translateY(-2px);
+  }
+
+  .product-top-bar {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-medium));
+    padding: 0.6rem var(--space-xl);
+  }
+
+  .product-top-bar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+  }
+
+  .product-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.7rem;
+    font-weight: var(--fw-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wider);
+    color: #fff;
+  }
+
+  .product-store {
+    font-size: 0.65rem;
+    font-weight: var(--fw-medium);
+    color: rgba(255,255,255,0.6);
+    letter-spacing: var(--ls-wide);
+  }
+
+  .product-box-inner {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+  }
+
+  /* Visual side */
+  .product-visual {
+    background: var(--color-bg-cool);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-xl);
+    gap: var(--space-lg);
+    border-right: 1px solid var(--color-border-light);
+  }
+
+  .product-image {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 160px;
+  }
+
+  .product-image img {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    border-radius: var(--radius-md);
+    transition: transform var(--transition-base);
+  }
+
+  .product-box-featured:hover .product-image img {
+    transform: scale(1.04);
+  }
+
+  .product-image-placeholder { opacity: 0.5; }
+
+  .product-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: var(--space-md) var(--space-xl);
+    background: var(--color-bg-pure);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-light);
+    width: 100%;
+  }
+
+  .product-score-number {
+    font-family: var(--font-heading);
+    font-size: var(--fs-3xl);
+    font-weight: var(--fw-extrabold);
+    color: var(--color-accent);
+    line-height: 1;
+    letter-spacing: var(--ls-tight);
+  }
+
+  .product-score-label {
+    font-size: 0.65rem;
+    font-weight: var(--fw-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-widest);
+    color: var(--color-text-muted);
+  }
+
+  /* Details side */
+  .product-details {
+    padding: var(--space-2xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .product-name {
+    font-family: var(--font-heading);
+    font-size: var(--fs-2xl);
+    font-weight: var(--fw-extrabold);
+    letter-spacing: var(--ls-tight);
+    line-height: var(--lh-snug);
+    color: var(--color-text);
+  }
+
+  .product-description {
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+    line-height: var(--lh-relaxed);
+    font-weight: var(--fw-light);
+    margin-bottom: var(--space-sm);
+  }
+
+  .product-pricing {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: var(--space-xs) 0;
+  }
+
+  .product-original-price {
+    font-size: var(--fs-sm);
+    color: var(--color-text-faint);
+    font-weight: var(--fw-light);
+  }
+
+  .product-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-sm);
+  }
+
+  .product-price {
+    font-family: var(--font-heading);
+    font-size: var(--fs-3xl);
+    font-weight: var(--fw-extrabold);
+    color: var(--color-primary);
+    letter-spacing: var(--ls-tight);
+    line-height: 1.1;
+  }
+
+  .product-discount {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.7rem;
+    font-weight: var(--fw-bold);
+    color: #fff;
+    background: #e74c3c;
+    border-radius: var(--radius-sm);
+    letter-spacing: var(--ls-wide);
+  }
+
+  .product-cta-area {
+    margin-top: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .product-cta-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: 1rem 2rem;
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: all var(--transition-base);
+    box-shadow: 0 4px 16px rgba(201, 162, 39, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-cta-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 600ms var(--ease-out-expo);
+  }
+
+  .product-cta-btn:hover::before { transform: translateX(100%); }
+
+  .product-cta-btn:hover {
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(201, 162, 39, 0.4);
+  }
+
+  .product-cta-text,
+  .product-cta-btn svg {
+    position: relative;
+    z-index: 1;
+  }
+
+  .product-cta-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    font-size: 0.68rem;
+    color: var(--color-text-faint);
+    font-weight: var(--fw-light);
+  }
+
+  /* ========== COMPACT ========== */
+  .product-box-compact {
+    background: linear-gradient(to right, var(--color-accent-surface), var(--color-bg-pure));
+    border: 1.5px solid var(--color-accent-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg) var(--space-xl);
+    margin: var(--space-xl) 0;
+    transition: all var(--transition-base);
+  }
+
+  .product-box-compact:hover {
+    box-shadow: var(--shadow-md), var(--shadow-gold);
+    transform: translateY(-1px);
+  }
+
+  .product-compact-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  .product-compact-img {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-bg-cool);
+  }
+
+  .product-compact-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .product-compact-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .product-compact-top {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+
+  .product-compact-badge {
+    padding: 0.15rem 0.5rem;
+    font-size: 0.6rem;
+    font-weight: var(--fw-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wider);
+    color: #fff;
+    background: var(--color-primary);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+  }
+
+  .product-compact-name {
+    font-size: var(--fs-base);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-tight);
+  }
+
+  .product-compact-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  .product-compact-price {
+    font-family: var(--font-heading);
+    font-size: var(--fs-base);
+    font-weight: var(--fw-extrabold);
+    color: var(--color-primary);
+  }
+
+  .product-compact-cta {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.6rem 1.5rem;
+    font-size: 0.72rem;
+    font-weight: var(--fw-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wide);
+    color: #fff;
+    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    box-shadow: 0 2px 10px rgba(201, 162, 39, 0.25);
+    white-space: nowrap;
+  }
+
+  .product-compact-cta:hover {
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(201, 162, 39, 0.35);
+  }
+
+  @media (max-width: 768px) {
+    .product-box-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .product-visual {
+      border-right: none;
+      border-bottom: 1px solid var(--color-border-light);
+      flex-direction: row;
+      padding: var(--space-lg);
+    }
+
+    .product-image { min-height: auto; }
+    .product-image img { max-height: 100px; }
+
+    .product-score {
+      width: auto;
+      padding: var(--space-sm) var(--space-md);
+    }
+
+    .product-score-number { font-size: var(--fs-2xl); }
+    .product-details { padding: var(--space-xl); }
+
+    .product-compact-inner { flex-wrap: wrap; }
+    .product-compact-cta { width: 100%; justify-content: center; }
+  }
+</style>

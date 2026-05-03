@@ -1,0 +1,12 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ImportPage from '../../plugins/wp-importer/ImportPage';
+---
+<AdminLayout title="Importar WordPress" activeSection="import-wp">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-slate-900">Importar do WordPress</h1>
+        <p class="text-slate-500 mt-1">Importe posts, categorias e autores a partir de um arquivo de exportação WordPress (.xml).</p>
+    </div>
+    <ImportPage client:load />
+</AdminLayout>

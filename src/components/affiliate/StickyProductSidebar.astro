@@ -1,0 +1,102 @@
+---
+import RatingStars from './RatingStars.astro';
+
+interface Props {
+  name: string;
+  price?: string;
+  rating?: number;
+  affiliateLink: string;
+  store?: string;
+  badge?: string;
+}
+
+const { name, price, rating, affiliateLink, store = 'outro', badge } = Astro.props;
+
+const storeLabels: Record<string, string> = {
+  'amazon': 'Ver na Amazon',
+  'hotmart': 'Acessar Curso',
+  'eduzz': 'Acessar Produto',
+  'monetizze': 'Acessar Produto',
+  'mercado-livre': 'Ver no ML',
+  'shopee': 'Ver na Shopee',
+  'outro': 'Ver Produto',
+};
+
+const ctaLabel = storeLabels[store] || 'Ver Produto';
+---
+
+<div class="sticky-product" id="stickyProduct">
+  <div class="sticky-product-inner">
+    {badge && <span class="sticky-badge">{badge}</span>}
+    <h4 class="sticky-name">{name}</h4>
+    {rating && (
+      <div class="sticky-rating">
+        <RatingStars rating={rating} size="sm" showNumber />
+      </div>
+    )}
+    {price && <span class="sticky-price">{price}</span>}
+    <a href={affiliateLink} class="btn btn-secondary sticky-cta" target="_blank" rel="sponsored noopener">
+      {ctaLabel}
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+    </a>
+  </div>
+</div>
+
+<style>
+  .sticky-product {
+    position: sticky;
+    top: calc(var(--navbar-height) + var(--space-xl));
+    background: var(--color-bg-pure);
+    border: 1px solid var(--color-accent-light);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition: box-shadow var(--transition-base);
+  }
+
+  .sticky-product:hover {
+    box-shadow: var(--shadow-md), var(--shadow-gold);
+  }
+
+  .sticky-product-inner {
+    padding: var(--space-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .sticky-badge {
+    align-self: flex-start;
+    padding: 0.2rem 0.65rem;
+    font-size: 0.6rem;
+    font-weight: var(--fw-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wider);
+    color: #fff;
+    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
+    border-radius: var(--radius-full);
+  }
+
+  .sticky-name {
+    font-family: var(--font-heading);
+    font-size: var(--fs-base);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-tight);
+    line-height: var(--lh-snug);
+  }
+
+  .sticky-price {
+    font-family: var(--font-heading);
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-extrabold);
+    color: var(--color-primary);
+    letter-spacing: var(--ls-tight);
+  }
+
+  .sticky-cta {
+    width: 100%;
+    justify-content: center;
+    margin-top: var(--space-sm);
+    padding: 0.7rem 1rem;
+    font-size: var(--fs-xs);
+  }
+</style>

@@ -1,0 +1,141 @@
+---
+/**
+ * SocialShare.astro — Plugin Social Share
+ *
+ * Renderiza título + botões de compartilhamento com URLs funcionais.
+ * Lê configurações de pluginsConfig.socialShare.
+ */
+import { readData } from '../../lib/readData';
+
+interface Props {
+  title?: string;
+  context?: 'post-bottom' | 'author-box';
+}
+
+const { title = '', context = 'post-bottom' } = Astro.props;
+
+const pluginsConfig = readData('pluginsConfig.json', {}) as any;
+const shareConfig = pluginsConfig?.socialShare;
+const enabled = shareConfig?.enabled !== false;
+const style = shareConfig?.style || 'icon';
+const sectionTitle: string = shareConfig?.sectionTitle || 'Compartilhe nas redes sociais';
+const platforms: string[] = shareConfig?.platforms || [
+  'facebook', 'twitter', 'whatsapp', 'linkedin', 'telegram', 'copy'
+];
+
+const platformDefs: Record<string, { icon: string; label: string }> = {
+  facebook:  { icon: 'fab fa-facebook-f',    label: 'Facebook'  },
+  twitter:   { icon: 'fab fa-twitter',        label: 'Twitter/X' },
+  whatsapp:  { icon: 'fab fa-whatsapp',       label: 'WhatsApp'  },
+  linkedin:  { icon: 'fab fa-linkedin-in',    label: 'LinkedIn'  },
+  telegram:  { icon: 'fab fa-telegram-plane', label: 'Telegram'  },
+  pinterest: { icon: 'fab fa-pinterest',      label: 'Pinterest' },
+  copy:      { icon: 'far fa-copy',           label: 'Copiar'    },
+};
+
+const activePlatforms = platforms.filter(p => platformDefs[p]);
+---
+
+{enabled && activePlatforms.length > 0 && (
+  <div class="walker-share-wrap" data-context={context}>
+    {sectionTitle && (
+      <p class="walker-share-title">{sectionTitle}</p>
+    )}
+    <ul
+      class="social-icons list-unstyled list-inline mb-0 walker-share-list"
+      data-style={style}
+    >
+      {activePlatforms.map(p => {
+        const def = platformDefs[p];
+        return (
+          <li class="list-inline-item" data-platform={p}>
+            <a href="#" class="walker-share-btn" aria-label={`Compartilhar no ${def.label}`} title={def.label}>
+              <i class={def.icon}></i>
+              {(style === 'label' || style === 'both') && (
+                <span class="share-label ms-1">{def.label}</span>
+              )}
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+)}
+
+<style>
+  .walker-share-wrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .walker-share-wrap[data-context="post-bottom"] {
+    align-items: flex-end;
+  }
+
+  .walker-share-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8f9bac;
+    margin: 0;
+    line-height: 1;
+  }
+</style>
+
+<script>
+(function() {
+  function initShareButtons() {
+    var lists = document.querySelectorAll('.walker-share-list');
+    lists.forEach(function(list) {
+      var pageUrl = encodeURIComponent(window.location.href);
+      var pageTitle = encodeURIComponent(document.title);
+      var btns = list.querySelectorAll('.walker-share-btn');
+      btns.forEach(function(btn) {
+        var li = btn.closest('[data-platform]') as HTMLElement;
+        var platform = li?.dataset.platform;
+        if (!platform) return;
+
+        var urls: Record<string, string> = {
+          facebook:  'https://www.facebook.com/sharer/sharer.php?u=' + pageUrl,
+          twitter:   'https://twitter.com/intent/tweet?url=' + pageUrl + '&text=' + pageTitle,
+          whatsapp:  'https://wa.me/?text=' + pageTitle + '%20' + pageUrl,
+          linkedin:  'https://www.linkedin.com/sharing/share-offsite/?url=' + pageUrl,
+          telegram:  'https://t.me/share/url?url=' + pageUrl + '&text=' + pageTitle,
+          pinterest: 'https://pinterest.com/pin/create/button/?url=' + pageUrl,
+          copy:      'copy',
+        };
+
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          var url = urls[platform!];
+          if (url === 'copy') {
+            navigator.clipboard?.writeText(window.location.href).then(function() {
+              var label = (btn as HTMLElement).querySelector('.share-label');
+              var icon = (btn as HTMLElement).querySelector('i');
+              var original = label ? label.textContent : null;
+              var originalIcon = icon ? icon.className : null;
+              if (label) label.textContent = 'Copiado!';
+              if (icon && !label) {
+                icon.className = 'fas fa-check';
+                setTimeout(function() { if (icon && originalIcon) icon.className = originalIcon; }, 2000);
+              }
+              setTimeout(function() { if (label) label.textContent = original; }, 2000);
+            });
+          } else {
+            window.open(url, '_blank', 'noopener,width=600,height=450');
+          }
+        });
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initShareButtons);
+  } else {
+    initShareButtons();
+  }
+})();
+</script>

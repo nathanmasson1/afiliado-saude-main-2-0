@@ -1,0 +1,161 @@
+---
+interface Props { data?: any; }
+const d = Astro.props.data || {};
+const stats = d.stats || [
+  { number: '4.9', suffix: '/5', label: 'Avaliação Média', detail: '+200 reviews verificados' },
+  { number: '50k', suffix: '+', label: 'Leitores Mensais', detail: 'Crescendo todo mês' },
+  { number: '500', suffix: '+', label: 'Produtos Avaliados', detail: 'Reviews detalhados' },
+  { number: 'R$2M', suffix: '+', label: 'Economia Gerada', detail: 'Para nossos leitores' },
+];
+const brands = d.brands || ['Amazon', 'Hotmart', 'Mercado Livre', 'Shopee', 'Eduzz', 'Monetizze'];
+---
+
+<section class="social-proof">
+  <div class="container">
+    <div class="proof-stats stagger-children animate-on-scroll">
+      {stats.map((stat) => (
+        <div class="proof-stat">
+          <div class="proof-stat-number">
+            {stat.number}<span class="proof-stat-suffix">{stat.suffix}</span>
+          </div>
+          <div class="proof-stat-label">{stat.label}</div>
+          <div class="proof-stat-detail">{stat.detail}</div>
+        </div>
+      ))}
+    </div>
+
+    <div class="proof-brands animate-on-scroll">
+      <div class="proof-brands-line"></div>
+      <p class="proof-brands-label">Avaliamos produtos das maiores plataformas</p>
+      <div class="proof-brands-list">
+        {brands.map((brand) => (
+          <span class="proof-brand">{brand}</span>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .social-proof {
+    padding: var(--space-3xl) 0 var(--space-4xl);
+    background: var(--color-bg);
+    position: relative;
+  }
+
+  .proof-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--color-border-light);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    margin-bottom: var(--space-4xl);
+  }
+
+  .proof-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: var(--space-2xl) var(--space-lg);
+    background: var(--color-bg);
+    transition: background var(--transition-base);
+    animation: fadeInUp 500ms var(--ease-out-expo) both;
+  }
+
+  .proof-stat:hover {
+    background: var(--color-bg-warm);
+  }
+
+  .proof-stat-number {
+    font-family: var(--font-heading);
+    font-size: var(--fs-3xl);
+    font-weight: var(--fw-extrabold);
+    color: var(--color-primary);
+    letter-spacing: var(--ls-tight);
+    line-height: 1;
+    margin-bottom: var(--space-sm);
+  }
+
+  .proof-stat-suffix {
+    font-weight: var(--fw-medium);
+    color: var(--color-primary-light);
+  }
+
+  .proof-stat-label {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--color-text);
+    margin-bottom: 4px;
+  }
+
+  .proof-stat-detail {
+    font-size: var(--fs-xs);
+    color: var(--color-text-faint);
+  }
+
+  /* Brands */
+  .proof-brands {
+    text-align: center;
+  }
+
+  .proof-brands-line {
+    width: 40px;
+    height: 1px;
+    background: var(--color-accent);
+    margin: 0 auto var(--space-lg);
+  }
+
+  .proof-brands-label {
+    font-size: var(--fs-xs);
+    color: var(--color-text-faint);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-widest);
+    margin-bottom: var(--space-xl);
+    font-weight: var(--fw-medium);
+  }
+
+  .proof-brands-list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3xl);
+    flex-wrap: wrap;
+  }
+
+  .proof-brand {
+    font-family: var(--font-heading);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+    color: var(--color-text);
+    opacity: 0.15;
+    transition: opacity var(--transition-base);
+    letter-spacing: var(--ls-tight);
+  }
+
+  .proof-brand:hover {
+    opacity: 0.5;
+  }
+
+  @media (max-width: 768px) {
+    .proof-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .proof-brands-list {
+      gap: var(--space-xl);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .proof-stats {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .proof-stat {
+      padding: var(--space-xl) var(--space-md);
+    }
+  }
+</style>

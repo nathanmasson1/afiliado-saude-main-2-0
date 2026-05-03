@@ -1,0 +1,8 @@
+---
+export const prerender = false;
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import ReviewEditor from '../../../components/admin/ReviewEditor';
+---
+<AdminLayout title="Novo Review" activeSection="reviews">
+    <ReviewEditor client:load />
+</AdminLayout>

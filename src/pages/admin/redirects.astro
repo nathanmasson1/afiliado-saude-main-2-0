@@ -1,0 +1,12 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import RedirectsManager from '../../plugins/redirects/RedirectsManager';
+---
+<AdminLayout title="Gerenciar Redirects" activeSection="redirects">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-slate-900">Gerenciar Redirects</h1>
+        <p class="text-slate-500 mt-1">Configure redirects 301/302 para migração de URLs e SEO.</p>
+    </div>
+    <RedirectsManager client:load />
+</AdminLayout>

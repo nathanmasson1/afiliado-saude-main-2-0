@@ -1,0 +1,12 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import CategoriesEditor from '../../components/admin/CategoriesEditor';
+---
+<AdminLayout title="Categorias" activeSection="categories">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-slate-900">Categorias</h1>
+        <p class="text-slate-500 mt-1">Organize seu blog com categorias bem definidas.</p>
+    </div>
+    <CategoriesEditor client:load />
+</AdminLayout>

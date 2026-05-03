@@ -1,0 +1,276 @@
+---
+import RatingStars from './RatingStars.astro';
+
+interface Product {
+  name: string;
+  price?: string;
+  rating?: number;
+  affiliateLink: string;
+  store?: string;
+  badge?: string;
+  featured?: boolean;
+}
+
+interface Props {
+  products: Product[];
+}
+
+const { products } = Astro.props;
+
+const storeLabels: Record<string, string> = {
+  'amazon': 'Amazon',
+  'hotmart': 'Hotmart',
+  'eduzz': 'Eduzz',
+  'monetizze': 'Monetizze',
+  'mercado-livre': 'ML',
+  'shopee': 'Shopee',
+  'outro': 'Ver',
+};
+---
+
+{products.length > 0 && (
+  <div class="comparison-wrapper">
+    <div class="comparison-header">
+      <h3 class="comparison-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        Comparativo de Produtos
+      </h3>
+    </div>
+
+    {/* Desktop table */}
+    <div class="comparison-table-wrap">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Preço</th>
+            <th>Avaliação</th>
+            <th>Onde Comprar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((product) => (
+            <tr class:list={[{ 'row-featured': product.featured }]}>
+              <td class="cell-product">
+                <div class="cell-product-inner">
+                  {product.badge && <span class="cell-badge">{product.badge}</span>}
+                  <span class="cell-name">{product.name}</span>
+                </div>
+              </td>
+              <td class="cell-price">{product.price || '—'}</td>
+              <td class="cell-rating">
+                {product.rating ? <RatingStars rating={product.rating} size="sm" /> : '—'}
+              </td>
+              <td class="cell-cta">
+                <a href={product.affiliateLink} class="table-cta-btn" target="_blank" rel="sponsored noopener">
+                  {storeLabels[product.store || 'outro'] || 'Ver'}
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+                </a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    {/* Mobile cards */}
+    <div class="comparison-cards">
+      {products.map((product) => (
+        <div class:list={['comparison-card', { 'card-featured': product.featured }]}>
+          <div class="card-top">
+            {product.badge && <span class="cell-badge">{product.badge}</span>}
+            <span class="card-name">{product.name}</span>
+          </div>
+          <div class="card-meta">
+            {product.price && <span class="card-price">{product.price}</span>}
+            {product.rating && <RatingStars rating={product.rating} size="sm" />}
+          </div>
+          <a href={product.affiliateLink} class="table-cta-btn" target="_blank" rel="sponsored noopener">
+            {storeLabels[product.store || 'outro'] || 'Ver'}
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+          </a>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+<style>
+  .comparison-wrapper {
+    margin: var(--space-2xl) 0;
+    background: var(--color-bg-pure);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+  }
+
+  .comparison-header {
+    padding: var(--space-lg) var(--space-xl);
+    background: var(--color-bg-cool);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .comparison-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-tight);
+    color: var(--color-text);
+  }
+
+  /* Desktop table */
+  .comparison-table-wrap {
+    overflow-x: auto;
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .comparison-table th {
+    text-align: left;
+    padding: var(--space-md) var(--space-xl);
+    font-size: 0.7rem;
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-widest);
+    color: var(--color-text-faint);
+    border-bottom: 1px solid var(--color-border-light);
+    white-space: nowrap;
+  }
+
+  .comparison-table td {
+    padding: var(--space-md) var(--space-xl);
+    border-bottom: 1px solid var(--color-border-light);
+    vertical-align: middle;
+  }
+
+  .comparison-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .row-featured {
+    background: var(--color-accent-surface);
+  }
+
+  .row-featured td:first-child {
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .cell-product-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .cell-badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.6rem;
+    font-weight: var(--fw-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wider);
+    color: var(--color-accent-dark);
+    background: var(--color-accent-light);
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+  }
+
+  .cell-name {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--color-text);
+  }
+
+  .cell-price {
+    font-family: var(--font-heading);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--color-primary);
+  }
+
+  .table-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 1rem;
+    font-size: 0.7rem;
+    font-weight: var(--fw-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wide);
+    color: #fff;
+    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all var(--transition-fast);
+    box-shadow: 0 2px 8px rgba(201, 162, 39, 0.2);
+  }
+
+  .table-cta-btn:hover {
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(201, 162, 39, 0.35);
+  }
+
+  /* Mobile cards */
+  .comparison-cards {
+    display: none;
+    padding: var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .comparison-card {
+    padding: var(--space-lg);
+    background: var(--color-bg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-light);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .card-featured {
+    border-color: var(--color-accent-light);
+    background: var(--color-accent-surface);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+
+  .card-name {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  .card-price {
+    font-family: var(--font-heading);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--color-primary);
+  }
+
+  @media (max-width: 768px) {
+    .comparison-table-wrap {
+      display: none;
+    }
+
+    .comparison-cards {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+</style>

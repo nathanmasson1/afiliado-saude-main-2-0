@@ -1,0 +1,96 @@
+---
+/**
+ * GoogleTag.astro — Plugin Google Tag (unified)
+ *
+ * Replaces both GoogleAnalytics.astro and GoogleTagManager.astro.
+ * Reads googleTag.tags[] from pluginsConfig.json (array of IDs).
+ * Also reads legacy keys for backward compat:
+ *   - googleAnalytics.measurementId
+ *   - googleTagManager.containerId
+ *
+ * For each tag ID:
+ *   - GTM-*  → loads gtm.js snippet + noscript fallback
+ *   - G-*, AW-*, DC-* → loads gtag.js (once), then gtag('config', id) for each
+ *
+ * Respects cookie consent (same pattern as the old GA plugin).
+ */
+import { readData } from '../../lib/readData';
+
+const pluginsConfig = readData('pluginsConfig.json', {}) as any;
+
+// Collect all tag IDs from new config + legacy keys
+const newTags: string[] = pluginsConfig?.googleTag?.tags || [];
+const legacyGA: string = pluginsConfig?.googleAnalytics?.measurementId || '';
+const legacyGTM: string = pluginsConfig?.googleTagManager?.containerId || '';
+
+const allTags = [...new Set([...newTags, ...(legacyGA ? [legacyGA] : []), ...(legacyGTM ? [legacyGTM] : [])])];
+
+const requireConsent: boolean = pluginsConfig?.cookieConsent?.enabled !== false;
+---
+
+{allTags.length > 0 && (
+  <script define:vars={{ allTags, requireConsent }}>
+  (function() {
+    function loadAllTags() {
+      if (window.__google_tags_loaded) return;
+      window.__google_tags_loaded = true;
+
+      var gtmIds = [];
+      var gtagIds = [];
+
+      for (var i = 0; i < allTags.length; i++) {
+        var id = allTags[i];
+        if (id.indexOf('GTM-') === 0) {
+          gtmIds.push(id);
+        } else {
+          gtagIds.push(id);
+        }
+      }
+
+      // Load GTM containers
+      for (var g = 0; g < gtmIds.length; g++) {
+        (function(id) {
+          // gtm.js snippet
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer',id);
+
+          // noscript fallback
+          var noscript = document.createElement('noscript');
+          var iframe = document.createElement('iframe');
+          iframe.src = 'https://www.googletagmanager.com/ns.html?id=' + id;
+          iframe.height = '0';
+          iframe.width = '0';
+          iframe.style.display = 'none';
+          iframe.style.visibility = 'hidden';
+          noscript.appendChild(iframe);
+          document.body.insertBefore(noscript, document.body.firstChild);
+        })(gtmIds[g]);
+      }
+
+      // Load gtag.js once for all G-/AW-/DC- IDs
+      if (gtagIds.length > 0) {
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + gtagIds[0];
+        document.head.appendChild(s);
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        window.gtag = gtag;
+        gtag('js', new Date());
+        for (var t = 0; t < gtagIds.length; t++) {
+          gtag('config', gtagIds[t]);
+        }
+      }
+    }
+
+    if (!requireConsent || localStorage.getItem('cookies-accepted') === 'true') {
+      loadAllTags();
+    } else {
+      window.addEventListener('cookies-accepted', loadAllTags, { once: true });
+    }
+  })();
+  </script>
+)}

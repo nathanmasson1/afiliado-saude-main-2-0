@@ -1,0 +1,85 @@
+---
+import { getCollection } from 'astro:content';
+import PostCard from './PostCard.astro';
+
+interface Props {
+  currentCategory: string;
+  currentSlug: string;
+  limit?: number;
+}
+
+const { currentCategory, currentSlug, limit = 3 } = Astro.props;
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const related = allPosts
+  .filter((post) => post.data.category === currentCategory && post.id !== currentSlug)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, limit);
+---
+
+{related.length > 0 && (
+  <section class="related-posts">
+    <div class="related-header">
+      <div class="related-line"></div>
+      <h3 class="related-title">Posts Relacionados</h3>
+    </div>
+    <div class="related-grid">
+      {related.map((post) => (
+        <PostCard
+          title={post.data.title}
+          description={post.data.description}
+          pubDate={post.data.pubDate}
+          image={post.data.image}
+          imageAlt={post.data.imageAlt}
+          category={post.data.category}
+          slug={post.id}
+          rating={post.data.rating}
+          badge={post.data.badge}
+          priceRange={post.data.priceRange}
+        />
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .related-posts {
+    padding: var(--space-4xl) 0 var(--space-2xl);
+  }
+
+  .related-header {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .related-line {
+    width: 40px;
+    height: 1px;
+    background: var(--color-accent);
+    margin-bottom: var(--space-lg);
+  }
+
+  .related-title {
+    font-family: var(--font-heading);
+    font-size: var(--fs-2xl);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-tight);
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+  }
+
+  @media (max-width: 1024px) {
+    .related-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .related-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

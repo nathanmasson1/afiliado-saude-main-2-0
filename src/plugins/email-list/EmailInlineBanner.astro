@@ -1,0 +1,105 @@
+---
+/**
+ * EmailInlineBanner.astro — Banner inline de captura de email (inserido nos posts)
+ *
+ * Lê config de pluginsConfig.json no build-time.
+ * Se inline.enabled = false, não renderiza nada.
+ * Injetado via JS no [slug].astro após o Nº parágrafo configurado.
+ */
+import { readData } from '../../lib/readData';
+
+const pluginsConfig = readData('pluginsConfig.json', {}) as any;
+const inlineConfig = pluginsConfig?.emailList?.inline;
+
+const enabled = inlineConfig?.enabled === true;
+const headline = inlineConfig?.headline || 'Gostando do conteúdo?';
+const subheadline = inlineConfig?.subheadline || 'Receba artigos como este direto no seu e-mail.';
+---
+
+{enabled && (
+<div id="email-inline-banner" style="margin: 2rem 0; padding: 1.75rem 2rem; background: #f5f3ff; border: 1.5px solid #ddd6fe; border-radius: 1rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+
+    <!-- Ícone -->
+    <div style="flex-shrink:0; width:3rem; height:3rem; background:linear-gradient(135deg,#7c3aed,#a855f7); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+    </div>
+
+    <!-- Textos -->
+    <div style="flex:1; min-width:180px;">
+        <p style="margin:0 0 0.25rem; font-weight:700; color:#1e1b4b; font-size:1rem;">{headline}</p>
+        <p style="margin:0; font-size:0.85rem; color:#6d28d9; line-height:1.4;">{subheadline}</p>
+    </div>
+
+    <!-- Form -->
+    <form id="email-inline-form" style="display:flex; gap:0.5rem; flex-wrap:wrap; flex-shrink:0;">
+        <input
+            id="email-inline-input"
+            type="email"
+            placeholder="Seu melhor e-mail"
+            required
+            style="padding:0.625rem 1rem; border:1.5px solid #c4b5fd; border-radius:0.625rem; font-size:0.875rem; outline:none; min-width:200px; transition:border-color 0.2s; background:#fff; box-sizing:border-box;"
+            onfocus="this.style.borderColor='#7c3aed'"
+            onblur="this.style.borderColor='#c4b5fd'"
+        />
+        <button
+            id="email-inline-btn"
+            type="submit"
+            style="padding:0.625rem 1.25rem; background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; border:none; border-radius:0.625rem; font-size:0.875rem; font-weight:700; cursor:pointer; white-space:nowrap; transition:opacity 0.2s;"
+        >
+            Inscrever-se
+        </button>
+    </form>
+
+    <!-- Mensagem de feedback -->
+    <p id="email-inline-msg" style="display:none; width:100%; text-align:center; margin:0.5rem 0 0; font-size:0.8rem; font-weight:600;"></p>
+
+</div>
+)}
+
+<script>
+(function() {
+    document.getElementById('email-inline-form')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const input = document.getElementById('email-inline-input') as HTMLInputElement | null;
+        const btn = document.getElementById('email-inline-btn') as HTMLButtonElement | null;
+        const msg = document.getElementById('email-inline-msg') as HTMLElement | null;
+        const email = input?.value?.trim();
+        if (!email || !btn || !msg) return;
+
+        btn.textContent = 'Enviando...';
+        btn.disabled = true;
+        msg.style.display = 'none';
+
+        try {
+            const res = await fetch('/api/subscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, source: 'inline' }),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                msg.textContent = data.message || 'Inscrito com sucesso!';
+                msg.style.color = '#16a34a';
+                msg.style.display = 'block';
+                if (input) input.value = '';
+                btn.textContent = 'Inscrito!';
+            } else {
+                msg.textContent = data.error || 'Erro ao inscrever.';
+                msg.style.color = '#dc2626';
+                msg.style.display = 'block';
+                btn.textContent = 'Inscrever-se';
+                btn.disabled = false;
+            }
+        } catch {
+            msg.textContent = 'Erro de rede. Tente novamente.';
+            msg.style.color = '#dc2626';
+            msg.style.display = 'block';
+            btn.textContent = 'Inscrever-se';
+            btn.disabled = false;
+        }
+    });
+})();
+</script>

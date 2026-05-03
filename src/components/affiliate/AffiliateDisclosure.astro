@@ -1,0 +1,80 @@
+---
+interface Props {
+  variant?: 'inline' | 'banner';
+}
+
+const { variant = 'inline' } = Astro.props;
+---
+
+<aside class:list={['affiliate-disclosure', `disclosure-${variant}`]} role="note">
+  {variant === 'inline' ? (
+    <p class="disclosure-text">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      Este artigo contém links de afiliado. Ao comprar pelos nossos links, podemos receber uma comissão sem custo adicional para você.
+    </p>
+  ) : (
+    <div class="disclosure-banner">
+      <div class="disclosure-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      </div>
+      <div>
+        <p class="disclosure-title">Transparência</p>
+        <p class="disclosure-text">Este artigo contém links de afiliado. Ao comprar pelos nossos links, podemos receber uma comissão sem custo adicional para você. Isso nos ajuda a manter o blog gratuito.</p>
+      </div>
+    </div>
+  )}
+</aside>
+
+<style>
+  .affiliate-disclosure {
+    margin: var(--space-lg) 0;
+  }
+
+  /* Inline variant */
+  .disclosure-inline .disclosure-text {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    font-size: var(--fs-xs);
+    color: var(--color-text-faint);
+    font-style: italic;
+    line-height: var(--lh-relaxed);
+    font-weight: var(--fw-light);
+  }
+
+  .disclosure-inline svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    opacity: 0.5;
+  }
+
+  /* Banner variant */
+  .disclosure-banner {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    background: var(--color-bg-cool);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-light);
+  }
+
+  .disclosure-icon {
+    flex-shrink: 0;
+    color: var(--color-primary-light);
+    margin-top: 2px;
+  }
+
+  .disclosure-title {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--color-text);
+    margin-bottom: 2px;
+  }
+
+  .disclosure-banner .disclosure-text {
+    font-size: var(--fs-xs);
+    color: var(--color-text-muted);
+    line-height: var(--lh-relaxed);
+    font-weight: var(--fw-light);
+  }
+</style>

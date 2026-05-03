@@ -1,0 +1,217 @@
+---
+interface Props { data?: any; }
+const d = Astro.props.data || {};
+const label = d.label || 'Sobre Nós';
+const title = d.title || 'Ajudamos você a fazer';
+const titleAccent = d.titleAccent || 'as melhores escolhas';
+const text1 = d.text1 || 'Somos apaixonados por encontrar os melhores produtos do mercado. Nosso blog nasceu da vontade de ajudar pessoas a tomar decisões de compra mais inteligentes, economizando tempo e dinheiro.';
+const text2 = d.text2 || 'Avaliamos produtos físicos das maiores lojas online e produtos digitais das principais plataformas, sempre com honestidade e transparência.';
+const ctaPrimary = d.ctaPrimary || { text: 'Saiba Mais', href: '/sobre' };
+const ctaSecondary = d.ctaSecondary || { text: 'Fale Conosco', href: '/contato' };
+const features = d.features || [
+  { number: '01', title: 'Análises Detalhadas', description: 'Testamos e avaliamos cada produto com critérios rigorosos antes de recomendar.' },
+  { number: '02', title: '100% Transparente', description: 'Informamos quando usamos links de afiliado. Nossa prioridade é sua confiança.' },
+  { number: '03', title: 'Curadoria de Qualidade', description: 'Selecionamos apenas produtos que realmente fazem diferença na vida das pessoas.' },
+];
+---
+
+<section class="about section" id="sobre">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-content animate-on-scroll">
+        <span class="section-label">{label}</span>
+        <h2 class="about-title">
+          {title}
+          <span class="about-title-accent">{titleAccent}</span>
+        </h2>
+        <p class="about-text">{text1}</p>
+        <p class="about-text">{text2}</p>
+        <div class="about-actions">
+          <a href={ctaPrimary.href} class="btn btn-primary">
+            {ctaPrimary.text}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+          <a href={ctaSecondary.href} class="btn btn-outline">{ctaSecondary.text}</a>
+        </div>
+      </div>
+
+      <div class="about-features stagger-children animate-on-scroll">
+        {features.map((feature) => (
+          <div class="about-feature">
+            <span class="about-feature-number">{feature.number}</span>
+            <div class="about-feature-content">
+              <h3 class="about-feature-title">{feature.title}</h3>
+              <p class="about-feature-text">{feature.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <div class="about-decoration">
+    <div class="about-deco-line"></div>
+  </div>
+</section>
+
+<style>
+  .about {
+    background: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4xl);
+    align-items: center;
+  }
+
+  .about-title {
+    font-family: var(--font-heading);
+    font-size: var(--fs-4xl);
+    font-weight: var(--fw-extrabold);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--ls-tight);
+    margin-bottom: var(--space-xl);
+    text-align: left;
+  }
+
+  .about-title-accent {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: var(--fw-regular);
+    font-style: italic;
+    color: var(--color-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .about-text {
+    font-size: var(--fs-md);
+    color: var(--color-text-secondary);
+    line-height: var(--lh-relaxed);
+    margin-bottom: var(--space-lg);
+    font-weight: var(--fw-light);
+  }
+
+  .about-actions {
+    display: flex;
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+  }
+
+  /* Features */
+  .about-features {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .about-feature {
+    display: flex;
+    gap: var(--space-xl);
+    padding: var(--space-xl) var(--space-2xl);
+    background: var(--color-bg-warm);
+    border-radius: var(--radius-xl);
+    border: 1px solid transparent;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 500ms var(--ease-out-expo) both;
+  }
+
+  .about-feature::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--color-primary);
+    border-radius: 0 3px 3px 0;
+    transform: scaleY(0);
+    transition: transform var(--transition-base);
+    transform-origin: center;
+  }
+
+  .about-feature:hover {
+    border-color: var(--color-border);
+    background: var(--color-bg-pure);
+    box-shadow: var(--shadow-md);
+    transform: translateX(4px);
+  }
+
+  .about-feature:hover::before {
+    transform: scaleY(1);
+  }
+
+  .about-feature-number {
+    font-family: var(--font-display);
+    font-size: var(--fs-3xl);
+    font-style: italic;
+    color: var(--color-primary-lighter);
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color var(--transition-base);
+  }
+
+  .about-feature:hover .about-feature-number {
+    color: var(--color-primary-light);
+  }
+
+  .about-feature-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .about-feature-title {
+    font-size: var(--fs-base);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-tight);
+  }
+
+  .about-feature-text {
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+    line-height: var(--lh-normal);
+    font-weight: var(--fw-light);
+  }
+
+  /* Decorative line */
+  .about-decoration {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--space-5xl);
+  }
+
+  .about-deco-line {
+    width: 100px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--color-accent), transparent);
+  }
+
+  @media (max-width: 768px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-3xl);
+    }
+
+    .about-title,
+    .about-text {
+      text-align: center;
+    }
+
+    .about-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .about-feature {
+      padding: var(--space-lg) var(--space-xl);
+    }
+  }
+</style>

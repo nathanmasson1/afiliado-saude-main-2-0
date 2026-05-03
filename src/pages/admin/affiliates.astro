@@ -1,0 +1,12 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import AffiliateManager from '../../plugins/affiliates/AffiliateManager';
+---
+<AdminLayout title="Amazon Affiliates" activeSection="affiliates">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-slate-900">Amazon Affiliates</h1>
+        <p class="text-slate-500 mt-1">Gerencie produtos e links de afiliado para seus artigos.</p>
+    </div>
+    <AffiliateManager client:load />
+</AdminLayout>

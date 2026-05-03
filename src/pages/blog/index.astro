@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout
+  title="Blog"
+  description="Todos os nossos artigos, reviews e recomendações de produtos físicos e digitais."
+>
+  <section class="blog-hero">
+    <div class="blog-hero-bg"></div>
+    <div class="container blog-hero-inner">
+      <span class="section-label">Blog</span>
+      <h1 class="blog-hero-title">
+        Todos os
+        <span class="blog-hero-accent">Posts</span>
+      </h1>
+      <p class="section-subtitle">
+        Explore nossos artigos, reviews detalhados e comparativos dos melhores produtos.
+      </p>
+    </div>
+  </section>
+
+  <section class="blog-posts section">
+    <div class="container">
+      <div class="blog-grid stagger-children animate-on-scroll">
+        {posts.map((post) => (
+          <PostCard
+            title={post.data.title}
+            description={post.data.description}
+            pubDate={post.data.pubDate}
+            image={post.data.image}
+            imageAlt={post.data.imageAlt}
+            category={post.data.category}
+            slug={post.id}
+            rating={post.data.rating}
+            badge={post.data.badge}
+            priceRange={post.data.priceRange}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .blog-hero {
+    position: relative;
+    padding: calc(var(--navbar-height) + var(--space-4xl)) 0 var(--space-4xl);
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .blog-hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 30%, rgba(216, 243, 220, 0.4) 0%, transparent 70%),
+      var(--color-bg-warm);
+    z-index: -1;
+  }
+
+  .blog-hero-title {
+    font-family: var(--font-heading);
+    font-size: var(--fs-5xl);
+    font-weight: var(--fw-extrabold);
+    letter-spacing: var(--ls-tight);
+    margin-bottom: var(--space-lg);
+  }
+
+  .blog-hero-accent {
+    font-family: var(--font-display);
+    font-weight: var(--fw-regular);
+    font-style: italic;
+    color: var(--color-primary);
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+  }
+
+  @media (max-width: 1024px) {
+    .blog-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .blog-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

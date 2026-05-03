@@ -1,0 +1,8 @@
+---
+interface Props {
+  title?: string;
+}
+const { title = '' } = Astro.props;
+import SocialShare from '../social-share/SocialShare.astro';
+---
+<SocialShare title={title} context="post-bottom" />

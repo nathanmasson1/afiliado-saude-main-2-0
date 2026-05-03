@@ -1,0 +1,7 @@
+[
+  { "name": "Produtos Físicos", "slug": "produtos-fisicos", "description": "Reviews e comparativos de produtos físicos" },
+  { "name": "Produtos Digitais", "slug": "produtos-digitais", "description": "Cursos, apps, SaaS e ferramentas digitais" },
+  { "name": "Reviews", "slug": "reviews", "description": "Análise detalhada de um produto específico" },
+  { "name": "Dicas", "slug": "dicas", "description": "Guias práticos e dicas úteis" },
+  { "name": "Comparativos", "slug": "comparativos", "description": "Comparação entre dois ou mais produtos" }
+]

@@ -1,0 +1,86 @@
+---
+interface Props {
+  rating: number;
+  size?: 'sm' | 'md' | 'lg';
+  showNumber?: boolean;
+}
+
+const { rating, size = 'md', showNumber = false } = Astro.props;
+
+const fullStars = Math.floor(rating);
+const hasHalf = rating % 1 >= 0.25 && rating % 1 < 0.75;
+const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0) - (rating % 1 >= 0.75 ? 1 : 0);
+const extraFull = rating % 1 >= 0.75 ? 1 : 0;
+const totalFull = fullStars + extraFull;
+
+const sizes = { sm: 14, md: 18, lg: 22 };
+const starSize = sizes[size];
+---
+
+<div class:list={['rating-stars', `rating-stars-${size}`]}>
+  <div class="stars-row">
+    {Array.from({ length: totalFull }).map(() => (
+      <svg width={starSize} height={starSize} viewBox="0 0 24 24" class="star star-filled">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
+      </svg>
+    ))}
+    {hasHalf && (
+      <svg width={starSize} height={starSize} viewBox="0 0 24 24" class="star star-half">
+        <defs>
+          <clipPath id={`half-${Math.random().toString(36).slice(2, 8)}`}>
+            <rect x="0" y="0" width="12" height="24"/>
+          </clipPath>
+        </defs>
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor" class="star-empty-path"/>
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor" clip-path={`url(#half-${Math.random().toString(36).slice(2, 8)})`} class="star-filled-path"/>
+      </svg>
+    )}
+    {Array.from({ length: emptyStars }).map(() => (
+      <svg width={starSize} height={starSize} viewBox="0 0 24 24" class="star star-empty">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
+      </svg>
+    ))}
+  </div>
+  {showNumber && <span class="rating-number">{rating.toFixed(1)}</span>}
+</div>
+
+<style>
+  .rating-stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .stars-row {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+  }
+
+  .star-filled {
+    color: var(--color-accent);
+  }
+
+  .star-empty {
+    color: var(--color-border);
+  }
+
+  .star-half .star-empty-path {
+    color: var(--color-border);
+  }
+
+  .star-half .star-filled-path {
+    color: var(--color-accent);
+  }
+
+  .rating-number {
+    font-family: var(--font-heading);
+    font-weight: var(--fw-bold);
+    color: var(--color-text);
+    letter-spacing: var(--ls-tight);
+  }
+
+  .rating-stars-sm .rating-number { font-size: var(--fs-xs); }
+  .rating-stars-md .rating-number { font-size: var(--fs-sm); }
+  .rating-stars-lg .rating-number { font-size: var(--fs-base); }
+</style>

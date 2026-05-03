@@ -1,0 +1,80 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import LeadsPanel from '../../plugins/email-list/LeadsPanel';
+import SettingsEmailList from '../../plugins/email-list/SettingsEmailList';
+import EmailSequenceEditor from '../../plugins/email-list/EmailSequenceEditor';
+import { readData } from '../../lib/readData';
+
+const pluginsConfig = readData<any>('pluginsConfig.json', {});
+const isBrevoConfigured = !!(pluginsConfig?.emailList?.brevoApiKey);
+const defaultTab = 'leads';
+---
+
+<AdminLayout title="Lista de Emails" activeSection="email-list">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-slate-900">Lista de Emails</h1>
+        <p class="text-slate-500 mt-1">Gerencie seus inscritos, popup de captura e sequências de email.</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mb-6">
+        <div class="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
+            <button
+                id="tab-leads"
+                onclick="showTab('leads')"
+                class="px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-white text-violet-700 shadow-sm"
+            >
+                👥 Leads
+            </button>
+            <button
+                id="tab-settings"
+                onclick="showTab('settings')"
+                class="px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900"
+            >
+                ⚙️ Configurações{!isBrevoConfigured && <span class="ml-1.5 w-2 h-2 bg-amber-400 rounded-full inline-block align-middle"></span>}
+            </button>
+            <button
+                id="tab-sequences"
+                onclick="showTab('sequences')"
+                class="px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900"
+            >
+                📧 Sequências
+            </button>
+        </div>
+    </div>
+
+    <div id="panel-leads">
+        <LeadsPanel client:load />
+    </div>
+    <div id="panel-settings" class="hidden">
+        <SettingsEmailList client:load />
+    </div>
+    <div id="panel-sequences" class="hidden">
+        <EmailSequenceEditor client:load />
+    </div>
+</AdminLayout>
+
+<script is:inline>
+function showTab(tab) {
+    var panels = {
+        leads: document.getElementById('panel-leads'),
+        settings: document.getElementById('panel-settings'),
+        sequences: document.getElementById('panel-sequences'),
+    };
+    var tabs = {
+        leads: document.getElementById('tab-leads'),
+        settings: document.getElementById('tab-settings'),
+        sequences: document.getElementById('tab-sequences'),
+    };
+
+    var activeClass   = 'px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-white text-violet-700 shadow-sm';
+    var inactiveClass = 'px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900';
+
+    Object.keys(panels).forEach(function(key) {
+        var isActive = key === tab;
+        if (panels[key]) panels[key].classList.toggle('hidden', !isActive);
+        if (tabs[key]) tabs[key].className = isActive ? activeClass : inactiveClass;
+    });
+}
+</script>

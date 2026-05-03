@@ -1,0 +1,117 @@
+---
+interface Props {
+  pros: string[];
+  cons: string[];
+}
+
+const { pros, cons } = Astro.props;
+---
+
+{(pros.length > 0 || cons.length > 0) && (
+  <div class="pros-cons">
+    {pros.length > 0 && (
+      <div class="pros-cons-col pros-col">
+        <h4 class="pros-cons-heading pros-heading">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Prós
+        </h4>
+        <ul class="pros-cons-list">
+          {pros.map((item) => (
+            <li class="pros-item">{item}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+    {cons.length > 0 && (
+      <div class="pros-cons-col cons-col">
+        <h4 class="pros-cons-heading cons-heading">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Contras
+        </h4>
+        <ul class="pros-cons-list">
+          {cons.map((item) => (
+            <li class="cons-item">{item}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </div>
+)}
+
+<style>
+  .pros-cons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    margin: var(--space-lg) 0;
+  }
+
+  .pros-cons-col {
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-light);
+  }
+
+  .pros-col {
+    background: rgba(27, 67, 50, 0.03);
+    border-color: rgba(27, 67, 50, 0.1);
+  }
+
+  .cons-col {
+    background: rgba(192, 57, 43, 0.03);
+    border-color: rgba(192, 57, 43, 0.1);
+  }
+
+  .pros-cons-heading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wider);
+    margin-bottom: var(--space-md);
+  }
+
+  .pros-heading { color: var(--color-primary); }
+  .cons-heading { color: #c0392b; }
+
+  .pros-cons-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .pros-item,
+  .cons-item {
+    font-size: var(--fs-sm);
+    color: var(--color-text-secondary);
+    line-height: var(--lh-normal);
+    padding-left: var(--space-lg);
+    position: relative;
+    font-weight: var(--fw-light);
+    list-style: none;
+  }
+
+  .pros-item::before {
+    content: '+';
+    position: absolute;
+    left: 0;
+    font-weight: var(--fw-bold);
+    color: var(--color-primary);
+  }
+
+  .cons-item::before {
+    content: '–';
+    position: absolute;
+    left: 0;
+    font-weight: var(--fw-bold);
+    color: #c0392b;
+  }
+
+  @media (max-width: 640px) {
+    .pros-cons {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

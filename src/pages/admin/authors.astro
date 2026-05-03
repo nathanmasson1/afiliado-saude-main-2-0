@@ -1,0 +1,12 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import AuthorsEditor from '../../components/admin/AuthorsEditor';
+---
+<AdminLayout title="Autores" activeSection="authors">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-slate-900">Autores</h1>
+        <p class="text-slate-500 mt-1">Gerencie os membros da equipe que escrevem no blog.</p>
+    </div>
+    <AuthorsEditor client:load />
+</AdminLayout>

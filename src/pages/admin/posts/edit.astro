@@ -1,0 +1,11 @@
+---
+export const prerender = false;
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import PostEditor from '../../../components/admin/PostEditor';
+
+const filePath = Astro.url.searchParams.get('file');
+if (!filePath) return Astro.redirect('/admin/posts');
+---
+<AdminLayout title="Editar Artigo" activeSection="posts">
+    <PostEditor filePath={filePath} client:load />
+</AdminLayout>

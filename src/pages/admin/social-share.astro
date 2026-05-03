@@ -1,0 +1,12 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import SettingsSocialShare from '../../plugins/social-share/SettingsSocialShare';
+---
+<AdminLayout title="Compartilhamento Social" activeSection="social-share">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-slate-900">Compartilhamento Social</h1>
+        <p class="text-slate-500 mt-1">Configure os botões de compartilhamento exibidos nos artigos.</p>
+    </div>
+    <SettingsSocialShare client:load />
+</AdminLayout>

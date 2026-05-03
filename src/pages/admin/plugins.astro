@@ -1,0 +1,15 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import PluginsHub from '../../components/admin/PluginsHub';
+import { readData } from '../../lib/readData';
+
+const registry = readData('pluginRegistry.json', []);
+---
+<AdminLayout title="Plugins" activeSection="plugins">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-slate-900">Plugins</h1>
+        <p class="text-slate-500 mt-1">Configure as integrações e funcionalidades extras do seu site.</p>
+    </div>
+    <PluginsHub registry={registry} client:load />
+</AdminLayout>
