@@ -77,8 +77,8 @@ export const POST: APIRoute = async ({ request }) => {
                     else if (data.image.toLowerCase().endsWith('.png')) ext = '.png';
                     else if (data.image.toLowerCase().endsWith('.webp')) ext = '.webp';
 
-                    const imgPath = `public/images/blog/${slug}${ext}`;
-                    const imageLocalPath = `/images/blog/${slug}${ext}`;
+                    const imgPath = `public/uploads/${Date.now()}-${slug}-cover${ext}`;
+                    const imageLocalPath = `/uploads/${Date.now()}-${slug}-cover${ext}`;
                     
                     const arrayBuffer = await imageRes.arrayBuffer();
                     const buffer = Buffer.from(arrayBuffer);
