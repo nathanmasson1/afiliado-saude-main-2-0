@@ -9,7 +9,7 @@ export const prerender = false;
 const PROJECT_ROOT = nodePath.resolve(fileURLToPath(import.meta.url), '../../../../../');
 
 function buildMarkdown(data: any): string {
-    const { title, description, slug, content, category, tags, image } = data;
+    const { title, description, slug, content, category, tags, image, author } = data;
     const pubDate = new Date().toISOString();
 
     const tagsStr = Array.isArray(tags) && tags.length > 0
@@ -22,6 +22,7 @@ description: "${description ? description.replace(/"/g, '\\"') : ''}"
 pubDate: ${pubDate}
 image: "${image || ''}"
 category: "${category || 'blog'}"
+author: "${author || 'SeuBlog'}"
 tags:${tagsStr}
 draft: false
 ---
@@ -44,11 +45,27 @@ export const POST: APIRoute = async ({ request }) => {
             console.warn('⚠️ WEBHOOK_SECRET not defined in environment variables. Webhook is unprotected.');
         }
 
+        // 1.5 Fetch First Author
+        let firstAuthor = 'SeuBlog';
+        try {
+            const authorsPath = nodePath.join(PROJECT_ROOT, 'src/data/authors.json');
+            const authorsData = await fs.readFile(authorsPath, 'utf-8');
+            const authorsArray = JSON.parse(authorsData);
+            if (Array.isArray(authorsArray) && authorsArray.length > 0 && authorsArray[0].name) {
+                firstAuthor = authorsArray[0].name;
+            }
+        } catch (e) {
+            console.warn('Could not read authors.json, defaulting to SeuBlog', e);
+        }
+
         // 2. Parse request payload
         const data = await request.json();
         if (!data.title || !data.content) {
             return new Response(JSON.stringify({ error: 'Missing title or content' }), { status: 400 });
         }
+        
+        // Inject the first author into the data payload
+        data.author = firstAuthor;
 
         const slug = data.slug || data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
         const filePath = `src/content/blog/${slug}.md`;
