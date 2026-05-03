@@ -27,7 +27,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
 
   <section class="blog-posts section">
     <div class="container">
-      <div class="blog-grid stagger-children animate-on-scroll">
+      <div class="blog-grid stagger-children">
         {posts.map((post) => (
           <PostCard
             title={post.data.title}
