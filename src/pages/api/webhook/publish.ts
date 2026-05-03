@@ -22,7 +22,7 @@ description: "${description ? description.replace(/"/g, '\\"') : ''}"
 pubDate: ${pubDate}
 image: "${image || ''}"
 category: "${category || 'blog'}"
-author: "${author || 'SeuBlog'}"
+author: "${author || 'Redação'}"
 tags:${tagsStr}
 draft: false
 ---
@@ -45,17 +45,43 @@ export const POST: APIRoute = async ({ request }) => {
             console.warn('⚠️ WEBHOOK_SECRET not defined in environment variables. Webhook is unprotected.');
         }
 
+        // GitHub API Config (moved up for author fetching)
+        const GITHUB_TOKEN = import.meta.env.GITHUB_TOKEN;
+        const GITHUB_OWNER = import.meta.env.GITHUB_OWNER;
+        const GITHUB_REPO = import.meta.env.GITHUB_REPO;
+        const repo = `${GITHUB_OWNER}/${GITHUB_REPO}`;
+
+        const githubHeaders: Record<string, string> = {
+            Authorization: `Bearer ${GITHUB_TOKEN}`,
+            Accept: 'application/vnd.github+json',
+        };
+
         // 1.5 Fetch First Author
-        let firstAuthor = 'SeuBlog';
+        let firstAuthor = 'Redação';
         try {
-            const authorsPath = nodePath.join(PROJECT_ROOT, 'src/data/authors.json');
-            const authorsData = await fs.readFile(authorsPath, 'utf-8');
-            const authorsArray = JSON.parse(authorsData);
-            if (Array.isArray(authorsArray) && authorsArray.length > 0 && authorsArray[0].name) {
-                firstAuthor = authorsArray[0].name;
+            if (!GITHUB_TOKEN || !GITHUB_OWNER || !GITHUB_REPO) {
+                const authorsPath = nodePath.join(PROJECT_ROOT, 'src/data/authors.json');
+                const authorsData = await fs.readFile(authorsPath, 'utf-8');
+                const authorsArray = JSON.parse(authorsData);
+                if (Array.isArray(authorsArray) && authorsArray.length > 0 && authorsArray[0].name) {
+                    firstAuthor = authorsArray[0].name;
+                }
+            } else {
+                const authorsGithubUrl = `https://api.github.com/repos/${repo}/contents/src/data/authors.json`;
+                const authorsRes = await fetch(authorsGithubUrl, { headers: githubHeaders });
+                if (authorsRes.ok) {
+                    const authorsJsonData = await authorsRes.json();
+                    if (authorsJsonData.content) {
+                        const decodedContent = Buffer.from(authorsJsonData.content, 'base64').toString('utf-8');
+                        const authorsArray = JSON.parse(decodedContent);
+                        if (Array.isArray(authorsArray) && authorsArray.length > 0 && authorsArray[0].name) {
+                            firstAuthor = authorsArray[0].name;
+                        }
+                    }
+                }
             }
         } catch (e) {
-            console.warn('Could not read authors.json, defaulting to SeuBlog', e);
+            console.warn('Could not read authors.json, defaulting to Redação', e);
         }
 
         // 2. Parse request payload
@@ -69,17 +95,6 @@ export const POST: APIRoute = async ({ request }) => {
 
         const slug = data.slug || data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
         const filePath = `src/content/blog/${slug}.md`;
-
-        // GitHub API Config
-        const GITHUB_TOKEN = import.meta.env.GITHUB_TOKEN;
-        const GITHUB_OWNER = import.meta.env.GITHUB_OWNER;
-        const GITHUB_REPO = import.meta.env.GITHUB_REPO;
-        const repo = `${GITHUB_OWNER}/${GITHUB_REPO}`;
-
-        const githubHeaders: Record<string, string> = {
-            Authorization: `Bearer ${GITHUB_TOKEN}`,
-            Accept: 'application/vnd.github+json',
-        };
 
         // 3. Handle External Image Download
         if (data.image && data.image.startsWith('http')) {
