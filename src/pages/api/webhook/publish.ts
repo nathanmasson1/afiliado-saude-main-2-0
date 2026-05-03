@@ -52,14 +52,84 @@ export const POST: APIRoute = async ({ request }) => {
 
         const slug = data.slug || data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
         const filePath = `src/content/blog/${slug}.md`;
-        const markdownContent = buildMarkdown(data);
 
-        // 3. Save logic (Dev vs Prod)
+        // GitHub API Config
         const GITHUB_TOKEN = import.meta.env.GITHUB_TOKEN;
         const GITHUB_OWNER = import.meta.env.GITHUB_OWNER;
         const GITHUB_REPO = import.meta.env.GITHUB_REPO;
+        const repo = `${GITHUB_OWNER}/${GITHUB_REPO}`;
 
-        // Dev mode (Local Filesystem)
+        const githubHeaders: Record<string, string> = {
+            Authorization: `Bearer ${GITHUB_TOKEN}`,
+            Accept: 'application/vnd.github+json',
+        };
+
+        // 3. Handle External Image Download
+        if (data.image && data.image.startsWith('http')) {
+            try {
+                const imageRes = await fetch(data.image);
+                if (imageRes.ok) {
+                    const contentType = imageRes.headers.get('content-type') || '';
+                    let ext = '.jpg'; // default
+                    if (contentType.includes('png')) ext = '.png';
+                    else if (contentType.includes('webp')) ext = '.webp';
+                    else if (contentType.includes('gif')) ext = '.gif';
+                    else if (data.image.toLowerCase().endsWith('.png')) ext = '.png';
+                    else if (data.image.toLowerCase().endsWith('.webp')) ext = '.webp';
+
+                    const imgPath = `public/images/blog/${slug}${ext}`;
+                    const imageLocalPath = `/images/blog/${slug}${ext}`;
+                    
+                    const arrayBuffer = await imageRes.arrayBuffer();
+                    const buffer = Buffer.from(arrayBuffer);
+
+                    // Save Image (Dev vs Prod)
+                    if (!GITHUB_TOKEN || !GITHUB_OWNER || !GITHUB_REPO) {
+                        const absImgPath = nodePath.join(PROJECT_ROOT, imgPath);
+                        await fs.mkdir(nodePath.dirname(absImgPath), { recursive: true });
+                        await fs.writeFile(absImgPath, buffer);
+                        console.log(`Imagem salva localmente: ${imgPath}`);
+                    } else {
+                        const imgGithubUrl = `https://api.github.com/repos/${repo}/contents/${imgPath}`;
+                        let imgSha: string | undefined;
+                        try {
+                            const existingImg = await fetch(imgGithubUrl, { headers: githubHeaders });
+                            if (existingImg.ok) {
+                                const existingData = await existingImg.json();
+                                imgSha = existingData.sha;
+                            }
+                        } catch (e) {}
+
+                        const writeImgBody: any = {
+                            message: `Upload image for post: ${data.title} via Webhook`,
+                            content: buffer.toString('base64'),
+                        };
+                        if (imgSha) writeImgBody.sha = imgSha;
+
+                        const uploadRes = await fetch(imgGithubUrl, {
+                            method: 'PUT',
+                            headers: { ...githubHeaders, 'Content-Type': 'application/json' },
+                            body: JSON.stringify(writeImgBody),
+                        });
+                        
+                        if (!uploadRes.ok) {
+                            console.error('Falha ao subir imagem pro GitHub:', await uploadRes.text());
+                        }
+                    }
+
+                    // Update data to use local path in markdown
+                    data.image = imageLocalPath;
+                } else {
+                    console.error('Falha ao baixar imagem, status:', imageRes.status);
+                }
+            } catch (imgError) {
+                console.error('Erro no download da imagem:', imgError);
+            }
+        }
+
+        // 4. Save Markdown (Dev vs Prod)
+        const markdownContent = buildMarkdown(data);
+
         if (!GITHUB_TOKEN || !GITHUB_OWNER || !GITHUB_REPO) {
             const absPath = nodePath.join(PROJECT_ROOT, filePath);
             await fs.mkdir(nodePath.dirname(absPath), { recursive: true });
@@ -72,18 +142,11 @@ export const POST: APIRoute = async ({ request }) => {
             }), { status: 200 });
         }
 
-        // Production mode (GitHub API)
-        const repo = `${GITHUB_OWNER}/${GITHUB_REPO}`;
         const githubUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
-        const headers: Record<string, string> = {
-            Authorization: `Bearer ${GITHUB_TOKEN}`,
-            Accept: 'application/vnd.github+json',
-        };
-
-        // Check if file exists to get SHA
+        
         let sha: string | undefined;
         try {
-            const existingRes = await fetch(githubUrl, { headers });
+            const existingRes = await fetch(githubUrl, { headers: githubHeaders });
             if (existingRes.ok) {
                 const existingData = await existingRes.json();
                 sha = existingData.sha;
@@ -98,7 +161,7 @@ export const POST: APIRoute = async ({ request }) => {
 
         const res = await fetch(githubUrl, {
             method: 'PUT',
-            headers: { ...headers, 'Content-Type': 'application/json' },
+            headers: { ...githubHeaders, 'Content-Type': 'application/json' },
             body: JSON.stringify(writeBody),
         });
 
@@ -111,7 +174,7 @@ export const POST: APIRoute = async ({ request }) => {
 
         return new Response(JSON.stringify({ 
             success: true, 
-            message: 'Post published to GitHub', 
+            message: 'Post and image published to GitHub', 
             path: filePath,
             sha: responseData.content?.sha
         }), { status: 200 });
