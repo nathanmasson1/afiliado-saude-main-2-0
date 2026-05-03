@@ -37,12 +37,13 @@ export const POST: APIRoute = async ({ request }) => {
         const WEBHOOK_SECRET = import.meta.env.WEBHOOK_SECRET;
         const authHeader = request.headers.get('Authorization');
 
-        if (WEBHOOK_SECRET) {
-            if (!authHeader || authHeader !== `Bearer ${WEBHOOK_SECRET}`) {
-                return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-            }
-        } else {
-            console.warn('⚠️ WEBHOOK_SECRET not defined in environment variables. Webhook is unprotected.');
+        if (!WEBHOOK_SECRET) {
+            console.error('CRITICAL: WEBHOOK_SECRET is not defined in environment variables.');
+            return new Response(JSON.stringify({ error: 'Server configuration error: WEBHOOK_SECRET missing.' }), { status: 500 });
+        }
+
+        if (!authHeader || authHeader !== `Bearer ${WEBHOOK_SECRET}`) {
+            return new Response(JSON.stringify({ error: 'Unauthorized. Invalid or missing token.' }), { status: 401 });
         }
 
         // GitHub API Config (moved up for author fetching)
