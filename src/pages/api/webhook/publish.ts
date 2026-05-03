@@ -37,7 +37,7 @@ export const POST: APIRoute = async ({ request }) => {
         const authHeader = request.headers.get('Authorization');
 
         if (WEBHOOK_SECRET) {
-            if (!authHeader || authHeader !== \`Bearer \${WEBHOOK_SECRET}\`) {
+            if (!authHeader || authHeader !== `Bearer ${WEBHOOK_SECRET}`) {
                 return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
             }
         } else {
@@ -51,7 +51,7 @@ export const POST: APIRoute = async ({ request }) => {
         }
 
         const slug = data.slug || data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-        const filePath = \`src/content/blog/\${slug}.md\`;
+        const filePath = `src/content/blog/${slug}.md`;
         const markdownContent = buildMarkdown(data);
 
         // 3. Save logic (Dev vs Prod)
@@ -73,10 +73,10 @@ export const POST: APIRoute = async ({ request }) => {
         }
 
         // Production mode (GitHub API)
-        const repo = \`\${GITHUB_OWNER}/\${GITHUB_REPO}\`;
-        const githubUrl = \`https://api.github.com/repos/\${repo}/contents/\${filePath}\`;
+        const repo = `${GITHUB_OWNER}/${GITHUB_REPO}`;
+        const githubUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
         const headers: Record<string, string> = {
-            Authorization: \`Bearer \${GITHUB_TOKEN}\`,
+            Authorization: `Bearer ${GITHUB_TOKEN}`,
             Accept: 'application/vnd.github+json',
         };
 
@@ -91,7 +91,7 @@ export const POST: APIRoute = async ({ request }) => {
         } catch (e) {}
 
         const writeBody: any = {
-            message: \`Publish post: \${data.title} via Webhook\`,
+            message: `Publish post: ${data.title} via Webhook`,
             content: Buffer.from(markdownContent).toString('base64'),
         };
         if (sha) writeBody.sha = sha;
@@ -104,7 +104,7 @@ export const POST: APIRoute = async ({ request }) => {
 
         if (!res.ok) {
             const errData = await res.json();
-            throw new Error(\`GitHub API Error: \${errData.message}\`);
+            throw new Error(`GitHub API Error: ${errData.message}`);
         }
 
         const responseData = await res.json();
